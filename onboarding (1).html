@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowDesk — Let's set you up</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #0f0e0c;
+    --paper: #faf8f3;
+    --cream: #f2ede2;
+    --sage: #4a7c59;
+    --sage-light: #d4e8d8;
+    --sage-dark: #2d5238;
+    --amber: #c9820a;
+    --amber-light: #fdecc8;
+    --coral: #d85a30;
+    --muted: #7a7468;
+    --border: rgba(15,14,12,0.12);
+    --font-display: 'Instrument Serif', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  [data-theme="dark"] {
+    --ink: #f0ede6; --paper: #131210; --cream: #1e1c19;
+    --sage: #5faa76; --sage-light: #172b20; --sage-dark: #90d4a8;
+    --amber: #e09b2a; --amber-light: #2a1d06; --muted: #8a8478;
+    --border: rgba(240,237,230,0.1);
+  }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--paper); color: var(--ink);
+    min-height: 100vh; padding: 2rem;
+    transition: background 0.35s, color 0.35s;
+  }
+
+  .ob-wrap {
+    max-width: 640px; margin: 0 auto;
+    padding: 2rem 0 4rem;
+  }
+
+  .ob-header {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: 3rem;
+  }
+  .ob-logo {
+    font-family: var(--font-display);
+    font-size: 1.4rem; color: var(--ink);
+    text-decoration: none; letter-spacing: -0.02em;
+  }
+  .ob-logo span { color: var(--sage); }
+  .ob-step-indicator {
+    font-size: 0.8rem; color: var(--muted);
+    font-weight: 500; letter-spacing: 0.05em;
+  }
+
+  /* Progress bar */
+  .ob-progress {
+    height: 3px; background: var(--cream);
+    border-radius: 100px; margin-bottom: 3rem;
+    overflow: hidden;
+  }
+  .ob-progress-fill {
+    height: 100%; background: var(--sage);
+    border-radius: 100px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Steps */
+  .ob-step { display: none; animation: stepIn 0.4s ease forwards; }
+  .ob-step.active { display: block; }
+  @keyframes stepIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .ob-eyebrow {
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--sage); margin-bottom: 0.75rem;
+  }
+  .ob-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    letter-spacing: -0.03em; line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+  .ob-title em { font-style: italic; color: var(--sage); }
+  .ob-subtitle { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 2rem; }
+
+  /* Chips — multi-select */
+  .chip-grid {
+    display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2rem;
+  }
+  .chip {
+    font-family: var(--font-body);
+    font-size: 0.88rem; font-weight: 400;
+    padding: 0.5rem 1.1rem; border-radius: 100px;
+    border: 1.5px solid var(--border);
+    background: var(--cream); color: var(--ink);
+    cursor: pointer; transition: all 0.18s ease;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--sage); color: var(--sage); }
+  .chip.selected {
+    background: var(--sage); color: #fff;
+    border-color: var(--sage);
+    box-shadow: 0 4px 12px rgba(74,124,89,0.25);
+  }
+
+  /* Input group */
+  .ob-input-group { display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: 2rem; }
+  .ob-input-row { display: flex; gap: 0.75rem; align-items: center; }
+  .ob-input {
+    font-family: var(--font-body); font-size: 0.92rem;
+    color: var(--ink); background: var(--cream);
+    border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 0.65rem 0.9rem; flex: 1; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .ob-input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(74,124,89,0.1); }
+  .ob-input::placeholder { color: var(--muted); opacity: 0.6; }
+  .add-course-btn {
+    font-family: var(--font-body); font-size: 0.85rem;
+    background: var(--sage-light); color: var(--sage-dark);
+    border: none; border-radius: 8px; padding: 0.65rem 1rem;
+    cursor: pointer; font-weight: 500; white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .add-course-btn:hover { background: var(--sage); color: #fff; }
+  .course-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .course-tag {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--cream); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.5rem 0.75rem;
+    font-size: 0.88rem; animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  .course-remove {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 1.1rem; line-height: 1;
+    padding: 0 0.2rem; transition: color 0.15s;
+  }
+  .course-remove:hover { color: var(--coral); }
+
+  /* Goal cards */
+  .goal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 2rem; }
+  .goal-card {
+    background: var(--cream); border: 2px solid var(--border);
+    border-radius: 14px; padding: 1.1rem 1.2rem;
+    cursor: pointer; transition: all 0.2s ease;
+    user-select: none;
+  }
+  .goal-card:hover { border-color: var(--sage); }
+  .goal-card.selected { border-color: var(--sage); background: var(--sage-light); }
+  .goal-icon { font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .goal-title { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.2rem; }
+  .goal-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
+
+  /* Study hours slider */
+  .slider-wrap { margin-bottom: 2rem; }
+  .slider-label {
+    display: flex; justify-content: space-between;
+    font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem;
+  }
+  .slider-value { color: var(--sage); font-weight: 500; }
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    background: var(--cream); border-radius: 100px; outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--sage); cursor: pointer;
+    box-shadow: 0 2px 8px rgba(74,124,89,0.35);
+    transition: transform 0.2s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  /* Nav buttons */
+  .ob-nav {
+    display: flex; gap: 0.75rem; align-items: center;
+    justify-content: space-between; margin-top: 1rem;
+  }
+  .btn-back {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); padding: 0.75rem 1.5rem;
+    border-radius: 100px; font-family: var(--font-body);
+    font-size: 0.9rem; cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-back:hover { color: var(--ink); border-color: var(--ink); }
+  .btn-next {
+    background: var(--sage); color: #fff;
+    border: none; padding: 0.75rem 2rem;
+    border-radius: 100px; font-family: var(--font-body);
+    font-size: 0.95rem; font-weight: 500; cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(74,124,89,0.3);
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-left: auto;
+  }
+  .btn-next:hover { background: var(--sage-dark); transform: translateY(-1px); }
+  .btn-next:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .ob-skip {
+    font-size: 0.82rem; color: var(--muted); text-decoration: none;
+    text-align: center; display: block; margin-top: 1.25rem;
+    transition: color 0.2s;
+  }
+  .ob-skip:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="ob-wrap">
+  <div class="ob-header">
+    <a href="index.html" class="ob-logo">Flow<span>Desk</span></a>
+    <div class="ob-step-indicator" id="stepIndicator">Step 1 of 4</div>
+  </div>
+
+  <div class="ob-progress">
+    <div class="ob-progress-fill" id="progressFill" style="width: 25%"></div>
+  </div>
+
+  <!-- STEP 1: What are you studying? -->
+  <div class="ob-step active" id="step1">
+    <div class="ob-eyebrow">Welcome</div>
+    <h1 class="ob-title">What are you<br><em>studying?</em></h1>
+    <p class="ob-subtitle">Select your field so we can suggest relevant features and templates.</p>
+    <div class="chip-grid" id="fieldChips">
+      <div class="chip" data-val="stem">STEM</div>
+      <div class="chip" data-val="business">Business</div>
+      <div class="chip" data-val="arts">Arts & Humanities</div>
+      <div class="chip" data-val="medicine">Medicine / Pre-med</div>
+      <div class="chip" data-val="law">Law</div>
+      <div class="chip" data-val="cs">Computer Science</div>
+      <div class="chip" data-val="social">Social Sciences</div>
+      <div class="chip" data-val="education">Education</div>
+      <div class="chip" data-val="other">Other</div>
+    </div>
+    <div class="ob-nav">
+      <button class="btn-next" id="nextStep1" onclick="goStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Add your courses -->
+  <div class="ob-step" id="step2">
+    <div class="ob-eyebrow">Your classes</div>
+    <h1 class="ob-title">Add your<br><em>courses.</em></h1>
+    <p class="ob-subtitle">We'll organize your tasks by class. Add up to 8 courses — you can always edit later.</p>
+    <div class="ob-input-group">
+      <div class="ob-input-row">
+        <input class="ob-input" type="text" id="courseInput" placeholder="e.g. Calculus II, English 101…" maxlength="50">
+        <button class="add-course-btn" onclick="addCourse()">+ Add</button>
+      </div>
+      <div class="course-list" id="courseList"></div>
+    </div>
+    <div class="ob-nav">
+      <button class="btn-back" onclick="goStep(1)">← Back</button>
+      <button class="btn-next" onclick="goStep(3)">Continue →</button>
+    </div>
+    <a href="#" class="ob-skip" onclick="goStep(3); return false;">Skip for now</a>
+  </div>
+
+  <!-- STEP 3: Set your goals -->
+  <div class="ob-step" id="step3">
+    <div class="ob-eyebrow">Your goals</div>
+    <h1 class="ob-title">What do you want<br><em>to achieve?</em></h1>
+    <p class="ob-subtitle">Pick all that apply. We'll personalize your dashboard accordingly.</p>
+    <div class="goal-grid" id="goalGrid">
+      <div class="goal-card" data-val="grades" onclick="toggleGoal(this)">
+        <div class="goal-icon">🎯</div>
+        <div class="goal-title">Better grades</div>
+        <div class="goal-desc">Stay on top of assignments and exam prep</div>
+      </div>
+      <div class="goal-card" data-val="focus" onclick="toggleGoal(this)">
+        <div class="goal-icon">🧠</div>
+        <div class="goal-title">Deeper focus</div>
+        <div class="goal-desc">Cut distractions and study in flow state</div>
+      </div>
+      <div class="goal-card" data-val="habits" onclick="toggleGoal(this)">
+        <div class="goal-icon">🌱</div>
+        <div class="goal-title">Build habits</div>
+        <div class="goal-desc">Consistent daily routines and streaks</div>
+      </div>
+      <div class="goal-card" data-val="balance" onclick="toggleGoal(this)">
+        <div class="goal-icon">⚖️</div>
+        <div class="goal-title">Work-life balance</div>
+        <div class="goal-desc">Study smarter, not longer</div>
+      </div>
+      <div class="goal-card" data-val="stress" onclick="toggleGoal(this)">
+        <div class="goal-icon">😌</div>
+        <div class="goal-title">Less stress</div>
+        <div class="goal-desc">Feel organized and in control</div>
+      </div>
+      <div class="goal-card" data-val="group" onclick="toggleGoal(this)">
+        <div class="goal-icon">👥</div>
+        <div class="goal-title">Study with friends</div>
+        <div class="goal-desc">Group sessions and shared boards</div>
+      </div>
+    </div>
+    <div class="ob-nav">
+      <button class="btn-back" onclick="goStep(2)">← Back</button>
+      <button class="btn-next" onclick="goStep(4)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Daily study goal -->
+  <div class="ob-step" id="step4">
+    <div class="ob-eyebrow">Almost done</div>
+    <h1 class="ob-title">How many hours<br><em>per day?</em></h1>
+    <p class="ob-subtitle">Set a daily study target. FlowDesk will remind you and track your progress.</p>
+
+    <div class="slider-wrap">
+      <div class="slider-label">
+        <span>Study target</span>
+        <span class="slider-value" id="sliderVal">2 hours / day</span>
+      </div>
+      <input type="range" id="hoursSlider" min="0.5" max="8" step="0.5" value="2">
+    </div>
+
+    <div class="slider-wrap">
+      <div class="slider-label">
+        <span>Pomodoro session length</span>
+        <span class="slider-value" id="pomVal">25 min</span>
+      </div>
+      <input type="range" id="pomSlider" min="15" max="60" step="5" value="25">
+    </div>
+
+    <div class="ob-nav">
+      <button class="btn-back" onclick="goStep(3)">← Back</button>
+      <button class="btn-next" id="btnFinish" onclick="finishOnboarding()">
+        <div class="spinner" id="finishSpinner" style="display:none; width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; animation:spin 0.7s linear infinite;"></div>
+        Let's go 🚀
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── THEME ──────────────────────────────────────────────────
+const saved = localStorage.getItem('flowdesk-theme');
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+else if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+  document.documentElement.setAttribute('data-theme', 'dark');
+
+// ── AUTH GUARD ─────────────────────────────────────────────
+let currentUser = null;
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  console.log('User loaded:', currentUser.id);
+})();
+
+// Make goStep work even before currentUser loads
+function waitForUser() {
+  return new Promise(resolve => {
+    if (currentUser) { resolve(); return; }
+    const interval = setInterval(() => {
+      if (currentUser) { clearInterval(interval); resolve(); }
+    }, 100);
+  });
+}
+
+// ── STATE ──────────────────────────────────────────────────
+let currentStep = 1;
+const totalSteps = 4;
+const state = {
+  field: null,
+  courses: [],
+  goals: [],
+  hoursPerDay: 2,
+  pomMinutes: 25,
+};
+
+// ── NAVIGATION ─────────────────────────────────────────────
+function goStep(n) {
+  document.getElementById(`step${currentStep}`).classList.remove('active');
+  currentStep = n;
+  document.getElementById(`step${currentStep}`).classList.add('active');
+  document.getElementById('stepIndicator').textContent = `Step ${n} of ${totalSteps}`;
+  document.getElementById('progressFill').style.width = `${(n / totalSteps) * 100}%`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── STEP 1: Field chips ────────────────────────────────────
+document.querySelectorAll('#fieldChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#fieldChips .chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    state.field = chip.dataset.val;
+  });
+});
+
+// ── STEP 2: Courses ────────────────────────────────────────
+document.getElementById('courseInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); addCourse(); }
+});
+
+function addCourse() {
+  const input = document.getElementById('courseInput');
+  const val = input.value.trim();
+  if (!val || state.courses.length >= 8) return;
+  if (state.courses.includes(val)) { input.value = ''; return; }
+  state.courses.push(val);
+  renderCourses();
+  input.value = '';
+  input.focus();
+}
+
+function removeCourse(i) {
+  state.courses.splice(i, 1);
+  renderCourses();
+}
+
+function renderCourses() {
+  const list = document.getElementById('courseList');
+  list.innerHTML = state.courses.map((c, i) => `
+    <div class="course-tag">
+      <span>${c}</span>
+      <button class="course-remove" onclick="removeCourse(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+// ── STEP 3: Goals ──────────────────────────────────────────
+function toggleGoal(el) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const idx = state.goals.indexOf(val);
+  if (idx === -1) state.goals.push(val);
+  else state.goals.splice(idx, 1);
+}
+
+// ── STEP 4: Sliders ────────────────────────────────────────
+document.getElementById('hoursSlider').addEventListener('input', function() {
+  state.hoursPerDay = parseFloat(this.value);
+  document.getElementById('sliderVal').textContent = `${this.value} hour${this.value == 1 ? '' : 's'} / day`;
+});
+document.getElementById('pomSlider').addEventListener('input', function() {
+  state.pomMinutes = parseInt(this.value);
+  document.getElementById('pomVal').textContent = `${this.value} min`;
+});
+
+// ── FINISH ─────────────────────────────────────────────────
+async function finishOnboarding() {
+  if (!currentUser) return;
+  const btn = document.getElementById('btnFinish');
+  btn.disabled = true;
+  document.getElementById('finishSpinner').style.display = 'block';
+
+  // Save profile + preferences to Supabase
+  const { error } = await sb.from('profiles').upsert({
+    id: currentUser.id,
+    full_name: currentUser.user_metadata?.full_name || '',
+    field: state.field,
+    goals: state.goals,
+    hours_per_day: state.hoursPerDay,
+    pom_minutes: state.pomMinutes,
+    onboarding_done: true,
+    updated_at: new Date().toISOString(),
+  });
+
+  // Save courses
+  if (state.courses.length > 0) {
+    const rows = state.courses.map((name, i) => ({
+      user_id: currentUser.id,
+      name,
+      color: ['#4a7c59','#c9820a','#d85a30','#7c4a7c','#2d5238','#8b6914','#c04030','#3a6b8a'][i % 8],
+    }));
+    await sb.from('courses').insert(rows);
+  }
+
+  if (error) {
+    btn.disabled = false;
+    document.getElementById('finishSpinner').style.display = 'none';
+    alert('Something went wrong. Please try again.');
+    return;
+  }
+
+  window.location.href = 'dashboard.html';
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+</script>
+</body>
+</html>

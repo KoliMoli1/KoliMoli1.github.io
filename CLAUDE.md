@@ -26,6 +26,9 @@ FlowDesk is a student productivity SaaS — single-file HTML/CSS/JS pages, no bu
 | `onboarding.html` | 4-step new user onboarding |
 | `dashboard.html` | Main app (1500+ lines) |
 | `supabase.js` | Supabase client init (imported by all pages) |
+| `privacy.html` | Privacy policy |
+| `terms.html` | Terms of service |
+| `google1e931fac63162d50.html` | DO NOT DELETE — Google Search Console verification |
 | `CLAUDE.md` | This file |
 
 **Page flow:** `index.html` → `auth.html` → `onboarding.html` (new users) → `dashboard.html`
@@ -85,8 +88,10 @@ habits     (id, user_id, name, emoji, completions[], created_at, updated_at)
 ### Auth
 - Email/password + Google OAuth
 - Redirect URLs: `https://kolimoli1.github.io/onboarding.html`, `https://kolimoli1.github.io/auth.html`
-- Google OAuth currently in "Testing" mode — needs publishing before public launch
+- Google OAuth: branding verified, publishing in progress
 - Email confirmation currently OFF (for development)
+
+**Legal:** Privacy policy at `/privacy.html`, Terms of Service at `/terms.html`
 
 ---
 
@@ -146,6 +151,10 @@ Canvas-based floating dot animation inside `<aside class="sidebar">`. Togglable 
 - [x] Dark mode + 6 color themes + font themes + density
 - [x] Sidebar particles canvas animation
 - [x] Fluid animations: view transitions, task slide-in, check pop, habit day pop, pomodoro ring glow
+- [x] Privacy policy (privacy.html)
+- [x] Terms of Service (terms.html)
+- [x] Google Search Console verification
+- [x] Google OAuth branding submitted
 
 ## Not Yet Built
 - [ ] Focus analytics / stats view

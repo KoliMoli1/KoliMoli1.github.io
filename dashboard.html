@@ -726,6 +726,69 @@
     .planner-grid { grid-template-columns: 1fr; }
   }
 
+  /* ── Planner header bar ──────────────────────────── */
+  .planner-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .planner-week-label {
+    font-family: var(--font-display); font-size: 1.1rem;
+    color: var(--ink); flex: 1;
+  }
+  .planner-nav-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--cream);
+    color: var(--ink); cursor: pointer; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .planner-nav-btn:hover { background: var(--sage-light); border-color: var(--sage); }
+  .planner-sync-btn {
+    padding: 5px 12px; border-radius: 100px;
+    border: 1px solid var(--border); background: var(--cream);
+    color: var(--ink); cursor: pointer; font-family: var(--font-body);
+    font-size: 0.8rem; transition: background 0.12s, border-color 0.12s;
+  }
+  .planner-sync-btn:hover { background: var(--sage-light); border-color: var(--sage); }
+  .planner-gcal-status {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-body); font-size: 0.78rem; color: var(--muted);
+  }
+  .planner-gcal-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #34a853; flex-shrink: 0;
+  }
+  .planner-connect-btn {
+    padding: 7px 16px; border-radius: 100px; border: none;
+    background: var(--sage); color: #fff; cursor: pointer;
+    font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+    transition: background 0.12s;
+  }
+  .planner-connect-btn:hover { background: var(--sage-dark); }
+  .planner-disconnect-btn {
+    background: none; border: none; color: var(--muted);
+    font-family: var(--font-body); font-size: 0.75rem;
+    cursor: pointer; text-decoration: underline; padding: 0;
+  }
+  .planner-disconnect-btn:hover { color: var(--coral); }
+  /* ── GCal event pills ────────────────────────────── */
+  .gcal-section {
+    display: flex; flex-direction: column; gap: 4px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+  .gcal-event {
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 8px; border-radius: 100px;
+    background: #e8f0fe; color: #1a56db;
+    font-family: var(--font-body); font-size: 0.72rem; font-weight: 500;
+    overflow: hidden;
+  }
+  [data-theme="dark"] .gcal-event {
+    background: rgba(66,133,244,0.15); color: #8ab4f8;
+  }
+  .gcal-event-time { font-weight: 700; flex-shrink: 0; }
+  .gcal-event-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
   @media (max-width: 900px) {
     .sidebar { display: none; }
     .dash-grid { grid-template-columns: 1fr 1fr; }
@@ -885,6 +948,7 @@
 
     <!-- WEEKLY PLANNER VIEW -->
     <div class="view" id="view-planner">
+      <div class="planner-header" id="planner-header"></div>
       <div class="planner-grid" id="planner-grid"></div>
     </div>
 
@@ -1057,6 +1121,10 @@ async function loadAll() {
 
   // Restore customize prefs
   restoreCustomize();
+
+  // Google Calendar — handle OAuth redirect then auto-fetch if token exists
+  gcalHandleRedirect();
+  if (gcalGetToken()) gcalFetchEvents();
 }
 
 // ── VIEW SWITCHING ─────────────────────────────────────────
@@ -1074,6 +1142,7 @@ function switchView(v) {
   currentView = v;
   if (v !== 'dashboard') document.getElementById('viewTitle').textContent = viewTitles[v];
   document.getElementById('btnAddMain').style.display = v === 'tasks' ? 'flex' : 'flex';
+  if (v === 'planner') renderPlanner();
 }
 
 // ── TASKS ──────────────────────────────────────────────────
@@ -1488,6 +1557,112 @@ function escapeHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ── Google Calendar ────────────────────────────────────────
+const GCAL_CLIENT_ID  = '22221523577-oor1v181hhj23ptq438sgnkn5jlt6hdg.apps.googleusercontent.com';
+const GCAL_REDIRECT   = 'https://kolimoli1.github.io/dashboard.html';
+const GCAL_SCOPE      = 'https://www.googleapis.com/auth/calendar.readonly';
+const GCAL_TOKEN_KEY  = 'flowdesk-gcal-token';
+const GCAL_EXPIRY_KEY = 'flowdesk-gcal-expiry';
+let gcalEvents = [];
+let plannerWeekOffset = 0;
+
+function gcalGetToken() {
+  const token  = localStorage.getItem(GCAL_TOKEN_KEY);
+  const expiry = parseInt(localStorage.getItem(GCAL_EXPIRY_KEY) || '0', 10);
+  if (!token || Date.now() > expiry) return null;
+  return token;
+}
+
+function gcalConnect() {
+  const params = new URLSearchParams({
+    client_id: GCAL_CLIENT_ID,
+    redirect_uri: GCAL_REDIRECT,
+    response_type: 'token',
+    scope: GCAL_SCOPE,
+    include_granted_scopes: 'true',
+  });
+  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+}
+
+function gcalDisconnect() {
+  localStorage.removeItem(GCAL_TOKEN_KEY);
+  localStorage.removeItem(GCAL_EXPIRY_KEY);
+  gcalEvents = [];
+  renderPlanner();
+}
+
+function gcalHandleRedirect() {
+  if (!location.hash.includes('access_token')) return;
+  const params    = new URLSearchParams(location.hash.slice(1));
+  const token     = params.get('access_token');
+  const expiresIn = parseInt(params.get('expires_in') || '3600', 10);
+  if (!token) return;
+  localStorage.setItem(GCAL_TOKEN_KEY,  token);
+  localStorage.setItem(GCAL_EXPIRY_KEY, String(Date.now() + expiresIn * 1000));
+  history.replaceState(null, '', location.pathname);
+  gcalFetchEvents();
+}
+
+async function gcalFetchEvents() {
+  const token = gcalGetToken();
+  if (!token) return;
+
+  // Compute week bounds for current offset
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const dow    = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1) + plannerWeekOffset * 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 0);
+
+  const params = new URLSearchParams({
+    timeMin: monday.toISOString(),
+    timeMax: sunday.toISOString(),
+    singleEvents: 'true',
+    orderBy: 'startTime',
+  });
+
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events?${params}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (res.status === 401) { gcalDisconnect(); return; }
+    const data = await res.json();
+    gcalEvents = data.items || [];
+    renderPlanner();
+  } catch (e) {
+    console.warn('GCal fetch error', e);
+  }
+}
+
+function plannerNav(dir) {
+  plannerWeekOffset += dir;
+  renderPlanner();
+  gcalFetchEvents();
+}
+
+function renderPlannerHeader(monday, sunday) {
+  const header = document.getElementById('planner-header');
+  if (!header) return;
+  const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const connected = !!gcalGetToken();
+  header.innerHTML = `
+    <button class="planner-nav-btn" onclick="plannerNav(-1)" title="Previous week">&#8249;</button>
+    <button class="planner-nav-btn" onclick="plannerNav(1)"  title="Next week">&#8250;</button>
+    <span class="planner-week-label">${fmt(monday)} – ${fmt(sunday)}</span>
+    ${connected ? `
+      <div class="planner-gcal-status">
+        <span class="planner-gcal-dot"></span>Google Calendar connected
+      </div>
+      <button class="planner-sync-btn" onclick="gcalFetchEvents()">&#x1F504; Sync</button>
+      <button class="planner-disconnect-btn" onclick="gcalDisconnect()">Disconnect</button>
+    ` : `
+      <button class="planner-connect-btn" onclick="gcalConnect()">Connect Google Calendar</button>
+    `}`;
+}
+
 function renderPlanner() {
   const grid = document.getElementById('planner-grid');
   if (!grid) return;
@@ -1495,9 +1670,16 @@ function renderPlanner() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const dow = today.getDay();
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+  // Monday of the displayed week
+  const dow       = today.getDay();
+  const thisMonday = new Date(today);
+  thisMonday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+  const monday = new Date(thisMonday);
+  monday.setDate(thisMonday.getDate() + plannerWeekOffset * 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  renderPlannerHeader(monday, sunday);
 
   const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   grid.innerHTML = '';
@@ -1507,13 +1689,31 @@ function renderPlanner() {
     day.setDate(monday.getDate() + i);
     const isToday = day.getTime() === today.getTime();
 
-    const yyyy = day.getFullYear();
-    const mm   = String(day.getMonth() + 1).padStart(2, '0');
-    const dd   = String(day.getDate()).padStart(2, '0');
+    const yyyy    = day.getFullYear();
+    const mm      = String(day.getMonth() + 1).padStart(2, '0');
+    const dd      = String(day.getDate()).padStart(2, '0');
     const dateStr = `${yyyy}-${mm}-${dd}`;
 
-    const dayTasks = tasks.filter(t => t.due_date === dateStr);
+    // GCal events for this day (above FlowDesk tasks)
+    const dayGcal = gcalEvents.filter(e => {
+      const start = (e.start.dateTime || e.start.date || '');
+      return start.startsWith(dateStr);
+    });
+    const gcalHtml = dayGcal.length > 0
+      ? `<div class="gcal-section">${dayGcal.map(e => {
+          const dt      = e.start.dateTime;
+          const timeStr = dt
+            ? new Date(dt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+            : '';
+          return `<div class="gcal-event">
+            ${timeStr ? `<span class="gcal-event-time">${timeStr}</span>` : ''}
+            <span class="gcal-event-title">${escapeHtml(e.summary || 'Event')}</span>
+          </div>`;
+        }).join('')}</div>`
+      : '';
 
+    // FlowDesk tasks for this day
+    const dayTasks = tasks.filter(t => t.due_date === dateStr);
     const tasksHtml = dayTasks.length === 0
       ? '<span class="planner-empty">No tasks</span>'
       : dayTasks.map(t => `
@@ -1529,6 +1729,7 @@ function renderPlanner() {
         <span class="planner-day-name">${DAY_NAMES[i]}</span>
         <span class="planner-day-date">${day.getDate()}</span>
       </div>
+      ${gcalHtml}
       <div class="planner-tasks">${tasksHtml}</div>
       <div class="planner-quick-add">
         <input type="text" id="planner-input-${dateStr}" placeholder="Add task…"

@@ -1,6 +1,6 @@
 # FlowDesk — Project Context for Claude Code
 
-> Auto-maintained by Claude. Last updated: 2026-03-12
+> Auto-maintained by Claude. Last updated: 2026-03-13
 
 ---
 
@@ -157,12 +157,40 @@ Canvas-based floating dot animation inside `<aside class="sidebar">`. Togglable 
 - [x] Google OAuth branding submitted
 
 ## Not Yet Built
-- [ ] Focus analytics / stats view
-- [ ] Focus mode (distraction-free fullscreen)
-- [ ] Study Group plan features
-- [ ] Stripe payment integration (test links exist in index.html, not wired)
-- [ ] Weekly planner: drag-to-reschedule tasks
-- [ ] Course management UI (courses created during onboarding only)
+- [ ] Focus analytics / stats view — **Eash**
+- [ ] Focus mode (distraction-free fullscreen) — **Eash**
+- [ ] Stripe payment integration (wire to actual Pro status) — **kolimoli1**
+- [ ] Study Group plan features — **kolimoli1**
+- [ ] Course management UI — **kolimoli1**
+- [ ] Weekly planner: drag-to-reschedule tasks — **unassigned**
+
+---
+
+## Ownership Split
+
+| Area | Owner | GitHub |
+|------|-------|--------|
+| Focus analytics view | Eash | eashman-design |
+| Focus mode (distraction-free) | Eash | eashman-design |
+| Stripe integration + billing | kolimoli1 | kolimoli1 |
+| Course management UI | kolimoli1 | kolimoli1 |
+| Shared (CLAUDE.md, supabase.js, design system) | Both | — |
+
+## Branch Convention
+- Eash: `eash/feature-name`
+- kolimoli1: `koli/feature-name`
+- Never commit directly to main
+- Always pull from main before starting a new branch
+- Open a PR when a feature is done — other person reviews before merging
+
+---
+
+## Known Bugs
+- Google OAuth always redirected to onboarding.html even for returning users — **fixed**: now redirects to dashboard.html; auth guard handles routing
+- `user-plan` in sidebar hardcodes "Free plan" for all users — needs to check actual Supabase subscription status once Stripe is wired
+- Stripe buy buttons in index.html use test-mode links and aren't connected to real subscription logic
+- Stat numbers on landing page (42k+ students, 2.1M tasks) are hardcoded placeholders
+- `escapeHtml()` function exists in dashboard.html but was missing in onboarding.html — **fixed**: added and applied in `renderCourses()`
 
 ---
 

@@ -349,6 +349,9 @@
 </div>
 
 <script>
+// ── HELPERS ────────────────────────────────────────────────
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 // ── THEME ──────────────────────────────────────────────────
 const saved = localStorage.getItem('flowdesk-theme');
 if (saved) document.documentElement.setAttribute('data-theme', saved);
@@ -436,7 +439,7 @@ function renderCourses() {
   const list = document.getElementById('courseList');
   list.innerHTML = state.courses.map((c, i) => `
     <div class="course-tag">
-      <span>${c}</span>
+      <span>${escapeHtml(c)}</span>
       <button class="course-remove" onclick="removeCourse(${i})">×</button>
     </div>
   `).join('');
@@ -471,7 +474,10 @@ async function finishOnboarding() {
   // Save profile + preferences to Supabase
   const { error } = await sb.from('profiles').upsert({
     id: currentUser.id,
-    full_name: currentUser.user_metadata?.full_name || '',
+    full_name: currentUser.user_metadata?.full_name
+               || currentUser.user_metadata?.name
+               || document.getElementById('signupName')?.value?.trim()
+               || currentUser.email.split('@')[0],
     field: state.field,
     goals: state.goals,
     hours_per_day: state.hoursPerDay,

@@ -9,6 +9,8 @@
 <script src="supabase.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  :focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
 
   :root {
     --ink: #0f0e0c;
@@ -249,6 +251,15 @@
     .auth-left { display: none; }
     .auth-right { padding: 5rem 1.5rem 2rem; align-items: flex-start; }
   }
+
+  .form-group { position: relative; }
+  .pw-toggle {
+    position: absolute; right: 0.75rem; bottom: 0.75rem;
+    background: none; border: none; cursor: pointer;
+    font-size: 0.75rem; color: var(--muted); padding: 0.2rem 0.4rem;
+    border-radius: 4px; transition: color 0.15s;
+  }
+  .pw-toggle:hover { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -264,15 +275,15 @@
 
   <div class="auth-left-stats">
     <div class="auth-stat">
-      <div class="auth-stat-num">42k+</div>
+      <div class="auth-stat-num">42k+</div> <!-- PLACEHOLDER — update before launch -->
       <div class="auth-stat-label">Active students</div>
     </div>
     <div class="auth-stat">
-      <div class="auth-stat-num">2.1M</div>
+      <div class="auth-stat-num">2.1M</div> <!-- PLACEHOLDER — update before launch -->
       <div class="auth-stat-label">Tasks completed</div>
     </div>
     <div class="auth-stat">
-      <div class="auth-stat-num">98%</div>
+      <div class="auth-stat-num">98%</div> <!-- PLACEHOLDER — update before launch -->
       <div class="auth-stat-label">Satisfaction rate</div>
     </div>
   </div>
@@ -283,6 +294,7 @@
   <a href="index.html" class="auth-back">← Back to home</a>
 
   <div class="auth-right-inner">
+    <h1 class="sr-only" id="authHeading">FlowDesk — Sign in or create account</h1>
     <!-- Tabs -->
     <div class="auth-tabs">
       <button class="auth-tab active" id="tabSignup" onclick="switchTab('signup')">Create account</button>
@@ -302,6 +314,7 @@
       <div class="form-group">
         <label class="form-label" for="signupPassword">Password</label>
         <input class="form-input" type="password" id="signupPassword" placeholder="Min. 8 characters" autocomplete="new-password" required minlength="8">
+        <button type="button" class="pw-toggle" aria-label="Show password" onclick="togglePw(this)">Show</button>
       </div>
 
       <div class="form-error" id="signupError"></div>
@@ -314,7 +327,7 @@
 
       <div class="divider">or</div>
 
-      <button type="button" class="btn-google" id="btnGoogleSignup">
+      <button type="button" class="btn-google" id="btnGoogleSignup" aria-label="Sign up with Google">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -338,6 +351,7 @@
       <div class="form-group">
         <label class="form-label" for="loginPassword">Password</label>
         <input class="form-input" type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password" required>
+        <button type="button" class="pw-toggle" aria-label="Show password" onclick="togglePw(this)">Show</button>
       </div>
       <div style="text-align: right; margin-top: -0.5rem;">
         <a href="#" style="font-size:0.82rem; color:var(--sage); text-decoration:none;" id="forgotLink">Forgot password?</a>
@@ -353,7 +367,7 @@
 
       <div class="divider">or</div>
 
-      <button type="button" class="btn-google" id="btnGoogleLogin">
+      <button type="button" class="btn-google" id="btnGoogleLogin" aria-label="Sign in with Google">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
           <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -466,12 +480,24 @@ document.getElementById('formLogin').addEventListener('submit', async (e) => {
 async function googleLogin() {
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/dashboard.html' }
+    options: { redirectTo: window.location.origin + '/auth.html' }
   });
-  if (error) alert(error.message);
+  if (error) {
+    showError('loginError', error.message);
+    document.getElementById('loginError').classList.add('visible');
+  }
 }
 document.getElementById('btnGoogleSignup').addEventListener('click', googleLogin);
 document.getElementById('btnGoogleLogin').addEventListener('click', googleLogin);
+
+// ── PASSWORD TOGGLE ────────────────────────────────────────
+function togglePw(btn) {
+  const input = btn.previousElementSibling;
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? 'Hide' : 'Show';
+  btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+}
 
 // ── FORGOT PASSWORD ────────────────────────────────────────
 document.getElementById('forgotLink').addEventListener('click', async (e) => {

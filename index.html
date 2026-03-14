@@ -671,6 +671,9 @@
   [data-theme="dark"] .price-btn-white { background: #131210; color: #f0ede6; }
   [data-theme="dark"] .feature-card::before { background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(95,170,118,0.08), transparent 60%); }
   [data-theme="dark"] #successPage { background: var(--paper); }
+
+  /* ACCESSIBILITY */
+  :focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -683,7 +686,7 @@
 
 <!-- NAV -->
 <nav id="mainNav">
-  <a href="#" class="nav-logo">Flow<span>Desk</span></a>
+  <a href="/" class="nav-logo">Flow<span>Desk</span></a>
   <ul class="nav-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#how">How it works</a></li>
@@ -692,14 +695,14 @@
   <div class="nav-right">
     <a href="auth.html" class="nav-cta">Get started free</a>
     <button id="themeToggle" aria-label="Toggle dark mode"></button>
-    <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <button class="nav-hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
       <span></span><span></span><span></span>
     </button>
   </div>
 </nav>
 
 <!-- MOBILE MENU DRAWER -->
-<div class="mobile-menu" id="mobileMenu">
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Navigation menu">
   <ul>
     <li><a href="#features" class="mobile-nav-link">Features</a></li>
     <li><a href="#how" class="mobile-nav-link">How it works</a></li>
@@ -728,9 +731,9 @@
     <a href="#how" class="btn-ghost">See how it works →</a>
   </div>
   <div class="hero-stats" id="heroStats">
-    <div class="stat"><div class="stat-num" data-count="42" data-suffix="k+">0k+</div><div class="stat-label">Active students</div></div>
-    <div class="stat"><div class="stat-num" data-count="2.1" data-suffix="M">0M</div><div class="stat-label">Tasks completed</div></div>
-    <div class="stat"><div class="stat-num" data-count="98" data-suffix="%">0%</div><div class="stat-label">Satisfaction rate</div></div>
+    <div class="stat"><div class="stat-num" data-count="42" data-suffix="k+">0k+</div><div class="stat-label">Active students</div></div> <!-- PLACEHOLDER — update with real numbers before launch -->
+    <div class="stat"><div class="stat-num" data-count="2.1" data-suffix="M">0M</div><div class="stat-label">Tasks completed</div></div> <!-- PLACEHOLDER — update with real numbers before launch -->
+    <div class="stat"><div class="stat-num" data-count="98" data-suffix="%">0%</div><div class="stat-label">Satisfaction rate</div></div> <!-- PLACEHOLDER — update with real numbers before launch -->
   </div>
 
   <div class="app-preview" id="appPreview">
@@ -862,7 +865,7 @@
         <li class="no">Calendar sync</li>
         <li class="no">Ambient sounds</li>
       </ul>
-      <a href="#" class="price-btn price-btn-outline">Get started</a>
+      <a href="auth.html" class="price-btn price-btn-outline">Get started</a>
     </div>
     <div class="price-card featured gs-fade">
       <div class="price-tier">Pro <span class="popular-badge">Popular</span></div>
@@ -878,7 +881,8 @@
         <li>Ambient sounds library</li>
         <li>No ads</li>
       </ul>
-      <a href="https://buy.stripe.com/test_4gM00kbNiaF3e5Q68jcIE00" class="price-btn price-btn-white" id="proBuyBtn">Start 3-day free trial</a>
+      <!-- TODO: replace with live Stripe Payment Link before launch -->
+      <a href="auth.html" class="price-btn price-btn-white" id="proBuyBtn">Start 3-day free trial</a>
     </div>
     <div class="price-card gs-fade">
       <div class="price-tier">Study Group</div>
@@ -893,7 +897,8 @@
         <li>Shared calendar</li>
         <li>Priority support</li>
       </ul>
-      <a href="https://buy.stripe.com/test_dRm8wQbNi3cBe5Q54fcIE01" class="price-btn price-btn-outline" id="groupBuyBtn">Get started</a>
+      <!-- TODO: replace with live Stripe Payment Link before launch -->
+      <a href="auth.html" class="price-btn price-btn-outline" id="groupBuyBtn">Get started</a>
     </div>
   </div>
 </section>
@@ -908,7 +913,7 @@
 <!-- TESTIMONIALS -->
 <section>
   <p class="section-eyebrow gs-fade">What students say</p>
-  <h2 class="gs-fade">Loved by <em>42,000+</em><br>students worldwide.</h2>
+  <h2 class="gs-fade">Loved by <em>42,000+</em><!-- PLACEHOLDER — update with real numbers before launch --><br>students worldwide.</h2>
   <div class="testimonials-grid">
     <div class="testi-card gs-scale">
       <div class="testi-stars">★★★★★</div>
@@ -941,10 +946,10 @@
 <div class="cta-section gs-scale">
   <p class="section-eyebrow" style="color: var(--sage-light); position: relative; z-index: 1;">Ready to flow?</p>
   <h2>Your best semester<br><em style="color: var(--sage-light);">starts today.</em></h2>
-  <p>Join 42,000+ students who study smarter with FlowDesk. Try Pro free for 3 days — no credit card required.</p>
+  <p>Join 42,000+<!-- PLACEHOLDER — update with real numbers before launch --> students who study smarter with FlowDesk. Try Pro free for 3 days — no credit card required.</p>
   <div style="display: flex; gap: 1rem; justify-content: center; position: relative; z-index: 1;">
     <a href="auth.html" class="btn-primary" style="background: var(--sage);">Create free account</a>
-    <a href="#" class="btn-ghost" style="color: #fff; border-color: rgba(255,255,255,0.3);">View demo →</a>
+    <a href="#how" class="btn-ghost" style="color: #fff; border-color: rgba(255,255,255,0.3);">View demo →</a>
   </div>
 </div>
 
@@ -952,10 +957,10 @@
 <footer>
   <div class="footer-logo">Flow<span>Desk</span></div>
   <ul class="footer-links">
-    <li><a href="#">Features</a></li>
-    <li><a href="#">Pricing</a></li>
-    <li><a href="#">Blog</a></li>
-    <li><a href="#">Help</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#">Blog</a></li> <!-- NOTE: blog page does not exist yet -->
+    <li><a href="#">Help</a></li> <!-- NOTE: help page does not exist yet -->
     <li><a href="privacy.html">Privacy</a></li>
     <li><a href="terms.html">Terms</a></li>
   </ul>
@@ -979,7 +984,7 @@
         <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.9rem;"><span style="color:var(--sage);font-weight:700;">✓</span> No ads — ever</div>
       </div>
     </div>
-    <a href="#" id="successBackBtn" class="btn-primary" style="display:inline-block;">Go to my dashboard →</a>
+    <a href="dashboard.html" id="successBackBtn" class="btn-primary" style="display:inline-block;">Go to my dashboard →</a>
     <div style="margin-top:1rem;font-size:0.8rem;color:var(--muted);">Questions? Email us at <a href="mailto:hello@flowdeskapp.com" style="color:var(--sage);text-decoration:none;">hello@flowdeskapp.com</a></div>
   </div>
 </div>
@@ -1168,12 +1173,14 @@ const mobileMenu = document.getElementById('mobileMenu');
 hamburger.addEventListener('click', () => {
   const isOpen = mobileMenu.classList.toggle('open');
   hamburger.classList.toggle('open', isOpen);
+  hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   document.body.style.overflow = isOpen ? 'hidden' : '';
 });
 document.querySelectorAll('.mobile-nav-link').forEach(link => {
   link.addEventListener('click', () => {
     mobileMenu.classList.remove('open');
     hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
   });
 });
@@ -1306,11 +1313,11 @@ if (urlParams.get('success') === 'true') {
     sp.querySelector('p').textContent = 'Your 3-day free trial has started. Invite up to 4 friends to join your group.';
   }
 }
-document.getElementById('successBackBtn').addEventListener('click', (e) => {
-  e.preventDefault();
+document.getElementById('successBackBtn').addEventListener('click', () => {
   document.getElementById('successPage').style.display = 'none';
   document.body.style.overflow = '';
   window.history.replaceState({}, '', window.location.pathname);
+  window.location.href = 'dashboard.html';
 });
 </script>
 </body>

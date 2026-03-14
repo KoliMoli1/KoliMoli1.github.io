@@ -213,3 +213,15 @@ Claude Code will auto-read this CLAUDE.md and have full project context. Never r
 6. **Escape user content** with `escapeHtml()` when injecting into innerHTML
 7. **Date strings** must use local time (not `toISOString()`) to avoid UTC offset bugs — see `renderPlanner()` for the correct pattern
 8. **Return 4 labeled blocks** when adding a full feature: CSS, HTML, Nav item, JS
+
+---
+
+## Active Skills
+
+The following skills are installed in `.claude/skills/` and should be loaded when relevant:
+
+- **ui-ux-pro-max** — Load for any UI design, styling, component work, or visual decisions. Contains 50+ styles, 161 color palettes, 57 font pairings, and 99 UX guidelines.
+- **ui-styling** — Load for shadcn/ui components, Tailwind customization, or canvas design system work.
+- **design** — Load for logo, icon, or slide design tasks.
+- **design-system** — Load for design tokens, component specs, or token architecture decisions.
+- **brand** — Load for brand consistency checks or guideline work.

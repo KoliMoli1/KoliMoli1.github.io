@@ -9,6 +9,7 @@
 <script src="supabase.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
 
   :root {
     --ink: #0f0e0c;
@@ -440,7 +441,7 @@ function renderCourses() {
   list.innerHTML = state.courses.map((c, i) => `
     <div class="course-tag">
       <span>${escapeHtml(c)}</span>
-      <button class="course-remove" onclick="removeCourse(${i})">×</button>
+      <button class="course-remove" onclick="removeCourse(${i})" aria-label="Remove ${escapeHtml(c)}">×</button>
     </div>
   `).join('');
 }
@@ -464,6 +465,12 @@ document.getElementById('pomSlider').addEventListener('input', function() {
   document.getElementById('pomVal').textContent = `${this.value} min`;
 });
 
+// ── HELPERS ────────────────────────────────────────────────
+function toLocalISOString(d = new Date()) {
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
 // ── FINISH ─────────────────────────────────────────────────
 async function finishOnboarding() {
   if (!currentUser) return;
@@ -483,7 +490,7 @@ async function finishOnboarding() {
     hours_per_day: state.hoursPerDay,
     pom_minutes: state.pomMinutes,
     onboarding_done: true,
-    updated_at: new Date().toISOString(),
+    updated_at: toLocalISOString(),
   });
 
   // Save courses

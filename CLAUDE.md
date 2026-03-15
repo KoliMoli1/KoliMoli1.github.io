@@ -216,6 +216,33 @@ Claude Code will auto-read this CLAUDE.md and have full project context. Never r
 
 ---
 
+## context-mode (MCP)
+
+context-mode is active. These routing rules protect the context window — follow them strictly.
+
+### BLOCKED commands
+- **curl / wget** — use `ctx_fetch_and_index(url, source)` or `ctx_execute(language: "javascript", ...)` instead
+- **WebFetch** — use `ctx_fetch_and_index` then `ctx_search(queries)` instead
+- **Inline HTTP in Bash** (`fetch('http`, `requests.get(`, etc.) — use `ctx_execute(language, code)` instead
+
+### REDIRECTED tools
+- **Bash with >20 lines output** — use `ctx_batch_execute(commands, queries)` or `ctx_execute(language: "shell", code: "...")` instead
+- **Read for analysis/exploration** (not editing) — use `ctx_execute_file(path, language, code)` instead; only printed summary enters context
+- **Grep with large results** — use `ctx_execute(language: "shell", code: "grep ...")` instead
+
+### Tool hierarchy
+1. `ctx_batch_execute(commands, queries)` — primary; runs all commands + auto-indexes
+2. `ctx_search(queries: [...])` — follow-up queries on indexed content
+3. `ctx_execute(language, code)` / `ctx_execute_file(path, language, code)` — sandbox execution
+4. `ctx_fetch_and_index(url, source)` → `ctx_search(queries)` — web fetching
+5. `ctx_index(content, source)` — store content in FTS5 knowledge base
+
+### Output constraints
+- Responses under 500 words
+- Write artifacts (code, configs) to FILES — never inline; return file path + 1-line description
+
+---
+
 ## Active Skills
 
 The following skills are installed in `.claude/skills/` and should be loaded when relevant:

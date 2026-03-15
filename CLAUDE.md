@@ -202,6 +202,16 @@ claude
 ```
 Claude Code will auto-read this CLAUDE.md and have full project context. Never run it from outside the repo folder.
 
+## Session Start — Required First Step
+
+**Before doing anything else in a new session**, invoke the `branch-manager` agent to report git status:
+- Current branch and any uncommitted changes
+- Branches that have unmerged commits
+- Branches that are merged and can be cleaned up
+- Whether local `main` is in sync with `origin/main`
+
+This gives both developer and Claude a shared picture of repo state before any work begins.
+
 ---
 
 ## Rules for Claude Code

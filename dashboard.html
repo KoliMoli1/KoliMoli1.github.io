@@ -601,6 +601,7 @@ async function loadAll() {
   const name = p?.full_name || currentUser.email.split('@')[0];
   document.getElementById('userName').textContent = name;
   document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('userPlan').textContent = p?.subscription_status || 'Free plan';
   document.getElementById('viewTitle').textContent = `${greet.split(' ')[1]}, ${name.split(' ')[0]} 👋`;
 
   const { data: c } = await sb.from('courses').select('*').eq('user_id', currentUser.id);

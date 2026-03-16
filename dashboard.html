@@ -82,7 +82,7 @@
   .toggle-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
   .toggle-switch { width: 44px; height: 24px; border-radius: 100px; background: var(--border); border: none; cursor: pointer; position: relative; transition: background 0.25s; flex-shrink: 0; }
   .toggle-switch.on { background: var(--sage); }
-  .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--paper); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
   .toggle-switch.on::after { transform: translateX(20px); }
 
   .cx-preview { background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.2rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; }
@@ -107,7 +107,7 @@
   .nav-badge { margin-left: auto; background: var(--sage); color: #fff; font-size: 0.65rem; font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 100px; min-width: 18px; text-align: center; }
 
   .sidebar-user { padding: 0.75rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 0.65rem; }
-  .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--sage); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 600; flex-shrink: 0; }
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--sage); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 600; flex-shrink: 0; }
   .user-name { font-size: 0.82rem; font-weight: 500; }
   .user-plan { font-size: 0.72rem; color: var(--muted); }
   .sidebar-actions { display: flex; gap: 0.3rem; margin-left: auto; }
@@ -124,11 +124,14 @@
   .main-content { padding: 1.5rem 2rem 3rem; }
 
   .view { display: none; }
-  .view.active { display: block; animation: viewIn 0.4s cubic-bezier(0.16,1,0.3,1); }
+  .view.active { display: block; animation: viewIn 0.25s cubic-bezier(0.16,1,0.3,1); }
   @keyframes viewIn { from { opacity: 0; transform: translateY(12px) scale(0.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-  .stat-card { background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem 1.2rem; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s; cursor: default; animation: cardIn 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+  .stat-card { background: var(--cream); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem 1.2rem; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s; cursor: default; animation: cardIn 0.5s cubic-bezier(0.16,1,0.3,1) both; display: flex; flex-direction: column; }
+  .stat-card-label { order: 1; }
+  .stat-card-val { order: 2; }
+  .stat-card-sub { order: 3; }
   .stat-card:nth-child(1) { animation-delay: 0.05s; }
   .stat-card:nth-child(2) { animation-delay: 0.12s; }
   .stat-card:nth-child(3) { animation-delay: 0.19s; }
@@ -207,7 +210,7 @@
   .pom-btn-circle:hover { background: var(--paper); transform: scale(1.05); }
   .pom-btn-play { width: 68px; height: 68px; background: var(--sage); border-color: var(--sage); font-size: 1.5rem; color: #fff; box-shadow: 0 6px 24px rgba(74,124,89,0.3); }
   .pom-btn-play:hover { background: var(--sage-dark); box-shadow: 0 8px 32px rgba(74,124,89,0.4); }
-  .pom-session-task { margin-top: 1.5rem; padding: 0.75rem 1rem; background: var(--cream); border: 1px solid var(--border); border-radius: 10px; font-size: 0.85rem; color: var(--muted); cursor: pointer; transition: border-color 0.2s; }
+  .pom-session-task { margin-top: 1.5rem; padding: 0.75rem 1rem; background: var(--cream); border: 1px solid var(--border); border-radius: 10px; font-size: 0.85rem; color: var(--muted); cursor: pointer; transition: border-color 0.2s; font-family: var(--font-body); text-align: left; width: 100%; }
   .pom-session-task:hover { border-color: var(--sage); }
   .pom-sessions-done { margin-top: 1.25rem; display: flex; gap: 0.4rem; justify-content: center; }
   .session-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cream); border: 1.5px solid var(--border); transition: background 0.3s, border-color 0.3s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
@@ -279,12 +282,20 @@
 
   .gcal-section { display: flex; flex-direction: column; gap: 4px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
   .gcal-event { display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 100px; background: #e8f0fe; color: #1a56db; font-family: var(--font-body); font-size: 0.72rem; font-weight: 500; overflow: hidden; }
-  [data-theme="dark"] .gcal-event { background: rgba(66,133,244,0.15); color: #8ab4f8; }
+  [data-theme="dark"] .planner-gcal-dot { background: #4caf50; }
+  [data-theme="dark"] .gcal-event { background: rgba(66,133,244,0.2); color: #8ab4f8; }
   .gcal-event-time { font-weight: 700; flex-shrink: 0; }
   .gcal-event-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  @media (max-width: 768px) { .planner-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 900px) { .sidebar { display: none; } .dash-grid { grid-template-columns: 1fr 1fr; } .dash-row { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .planner-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) {
+    .sidebar { display: flex; position: fixed; top: 0; left: 0; bottom: 0; width: 260px; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.16,1,0.3,1); z-index: 1000; }
+    body.nav-open .sidebar { transform: translateX(0); }
+    .hamburger { display: flex; }
+    .nav-overlay { display: block; }
+    .dash-grid { grid-template-columns: 1fr 1fr; }
+    .dash-row { grid-template-columns: 1fr; }
+  }
   @media (max-width: 600px) { .dash-grid { grid-template-columns: 1fr; } .main-header, .main-content { padding-left: 1rem; padding-right: 1rem; } }
 
   .analytics-bar-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
@@ -292,24 +303,57 @@
   .analytics-bar-track { flex: 1; height: 8px; background: var(--cream); border-radius: 100px; overflow: hidden; }
   .analytics-bar-fill { height: 100%; background: var(--sage); border-radius: 100px; transition: width 0.6s cubic-bezier(0.16,1,0.3,1); }
   .analytics-bar-value { font-size: 0.8rem; color: var(--muted); width: 36px; text-align: right; flex-shrink: 0; }
+
+  .hamburger {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 36px; height: 36px;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+  }
+  .nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 999;
+  }
+  body.nav-open .nav-overlay { display: block; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pom-running .pom-progress-arc { animation: none; filter: none; }
+    .view { animation: none; }
+    .task-row { animation: none; }
+    .check-pop { animation: none; }
+    .day-pop { animation: none; }
+  }
 </style>
 </head>
 <body>
 
+<div class="nav-overlay" onclick="closeMobileNav()"></div>
+
 <aside class="sidebar">
   <canvas id="sidebarParticles" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.4;z-index:0;"></canvas>
   <a href="index.html" class="sidebar-logo">Flow<span>Desk</span></a>
-  <nav class="sidebar-nav">
+  <nav class="sidebar-nav" aria-label="Main navigation">
     <div class="sidebar-section">Menu</div>
-    <button class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')"><span class="nav-icon">⊞</span> Dashboard</button>
-    <button class="nav-item" id="nav-tasks" onclick="switchView('tasks')"><span class="nav-icon">✓</span> Tasks <span class="nav-badge" id="taskBadge">0</span></button>
-    <button class="nav-item" id="nav-pomodoro" onclick="switchView('pomodoro')"><span class="nav-icon">◎</span> Pomodoro</button>
-    <button class="nav-item" id="nav-habits" onclick="switchView('habits')"><span class="nav-icon">◈</span> Habits</button>
-    <button class="nav-item" id="nav-planner" onclick="switchView('planner')"><span class="nav-icon">▦</span> Planner</button>
-    <button class="nav-item" id="nav-analytics" onclick="switchView('analytics')"><span class="nav-icon">📊</span> Analytics</button>
-    <button class="nav-item" id="nav-customize" onclick="switchView('customize')"><span class="nav-icon">✦</span> Customize</button>
+    <button class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')"><span class="nav-icon" aria-hidden="true">⊞</span> Dashboard</button>
+    <button class="nav-item" id="nav-tasks" onclick="switchView('tasks')"><span class="nav-icon" aria-hidden="true">✓</span> Tasks <span class="nav-badge" id="taskBadge">0</span></button>
+    <button class="nav-item" id="nav-pomodoro" onclick="switchView('pomodoro')"><span class="nav-icon" aria-hidden="true">◎</span> Pomodoro</button>
+    <button class="nav-item" id="nav-habits" onclick="switchView('habits')"><span class="nav-icon" aria-hidden="true">◈</span> Habits</button>
+    <button class="nav-item" id="nav-planner" onclick="switchView('planner')"><span class="nav-icon" aria-hidden="true">▦</span> Planner</button>
+    <button class="nav-item" id="nav-analytics" onclick="switchView('analytics')"><span class="nav-icon" aria-hidden="true">📊</span> Analytics</button>
+    <button class="nav-item" id="nav-customize" onclick="switchView('customize')"><span class="nav-icon" aria-hidden="true">✦</span> Customize</button>
     <div class="sidebar-section" style="margin-top:0.5rem;">Account</div>
-    <button class="nav-item" onclick="handleSignOut()"><span class="nav-icon">↩</span> Sign out</button>
+    <button class="nav-item" onclick="handleSignOut()"><span class="nav-icon" aria-hidden="true">↩</span> Sign out</button>
   </nav>
   <div class="sidebar-user">
     <div class="user-avatar" id="userAvatar">?</div>
@@ -325,9 +369,10 @@
 
 <main class="main">
   <div class="main-header">
+    <button class="hamburger" onclick="toggleMobileNav()" aria-label="Open navigation menu" aria-expanded="false" id="hamburgerBtn">☰</button>
     <div>
       <div class="main-greeting" id="greeting">Good morning</div>
-      <h1 class="main-title" id="viewTitle">Dashboard</h1>
+      <h1 class="main-title" id="viewTitle" tabindex="-1">Dashboard</h1>
     </div>
     <div class="header-actions">
       <button class="btn-add" id="btnAddMain" onclick="openAddModal()">+ Add task</button>
@@ -338,7 +383,7 @@
   <div class="main-content">
 
     <!-- DASHBOARD -->
-    <div class="view active" id="view-dashboard">
+    <div class="view active" id="view-dashboard" role="region" aria-label="Dashboard overview">
       <div class="dash-grid">
         <div class="stat-card">
           <div class="stat-card-label">Tasks today</div>
@@ -358,11 +403,11 @@
       </div>
       <div class="dash-row">
         <div class="panel">
-          <div class="panel-title">Today's tasks</div>
-          <div id="dashTaskList"><div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">No tasks yet.<br>Add your first one!</div></div></div>
+          <h2 class="panel-title">Today's tasks</h2>
+          <div id="dashTaskList"><div class="empty-state"><div class="empty-state-icon" aria-hidden="true">📋</div><div class="empty-state-text">No tasks yet.<br>Add your first one!</div></div></div>
         </div>
         <div class="panel">
-          <div class="panel-title">Quick Pomodoro</div>
+          <h2 class="panel-title">Quick Pomodoro</h2>
           <div style="text-align:center;padding:1rem 0;">
             <div style="font-family:var(--font-display);font-size:3rem;letter-spacing:-0.04em;margin-bottom:0.75rem;" id="quickTimer">25:00</div>
             <button class="btn-add" style="margin:0 auto;display:inline-flex;" onclick="switchView('pomodoro')">▶ Start session</button>
@@ -372,29 +417,33 @@
     </div>
 
     <!-- TASKS -->
-    <div class="view" id="view-tasks">
+    <div class="view" id="view-tasks" role="region" aria-label="Tasks">
       <div class="task-filters">
-        <button class="filter-chip active" onclick="filterTasks('all',this)">All</button>
-        <button class="filter-chip" onclick="filterTasks('today',this)">Due today</button>
-        <button class="filter-chip" onclick="filterTasks('pending',this)">Pending</button>
-        <button class="filter-chip" onclick="filterTasks('done',this)">Done</button>
+        <button class="filter-chip active" onclick="filterTasks('all',this)" aria-pressed="true">All</button>
+        <button class="filter-chip" onclick="filterTasks('today',this)" aria-pressed="false">Due today</button>
+        <button class="filter-chip" onclick="filterTasks('pending',this)" aria-pressed="false">Pending</button>
+        <button class="filter-chip" onclick="filterTasks('done',this)" aria-pressed="false">Done</button>
       </div>
       <div class="add-task-form" id="addTaskForm">
         <div class="add-task-inputs">
+          <label for="newTaskTitle" class="sr-only">Task title</label>
           <input class="add-task-input" type="text" id="newTaskTitle" placeholder="Task title…">
+          <label for="newTaskDue" class="sr-only">Due date</label>
           <input class="add-task-input" type="date" id="newTaskDue" style="width:140px;">
+          <label for="newTaskCourse" class="sr-only">Course</label>
           <select class="add-task-select" id="newTaskCourse"><option value="">No course</option></select>
         </div>
         <div class="add-task-actions">
           <button class="btn-sm btn-sm-ghost" onclick="closeAddForm()">Cancel</button>
           <button class="btn-sm btn-sm-primary" onclick="saveTask()">Add task</button>
         </div>
+        <div id="taskErrorToast" style="display:none;color:var(--coral);font-size:0.875rem;margin-top:0.5rem;"></div>
       </div>
       <div id="taskListContainer"></div>
     </div>
 
     <!-- POMODORO -->
-    <div class="view" id="view-pomodoro">
+    <div class="view" id="view-pomodoro" role="region" aria-label="Pomodoro timer">
       <div class="pom-wrap">
         <div class="pom-mode-tabs">
           <button class="pom-mode-btn active" onclick="setPomMode('focus',this)">Focus</button>
@@ -407,7 +456,7 @@
             <circle class="pom-progress-arc" id="pomArc" cx="120" cy="120" r="108" stroke-dasharray="678.6" stroke-dashoffset="0"/>
           </svg>
           <div class="pom-center">
-            <div class="pom-time" id="pomDisplay">25:00</div>
+            <div class="pom-time" id="pomDisplay" role="timer" aria-live="off" aria-label="25:00 remaining">25:00</div>
             <div class="pom-session-label" id="pomLabel">FOCUS SESSION</div>
           </div>
         </div>
@@ -416,64 +465,65 @@
           <button class="pom-btn-circle pom-btn-play" id="pomPlayBtn" onclick="togglePom()" aria-label="Start timer">▶</button>
           <button class="pom-btn-circle" onclick="skipPom()" aria-label="Skip session">⏭</button>
         </div>
-        <div class="pom-session-task" id="pomTaskLabel" onclick="switchView('tasks')">📌 Click to link a task</div>
-        <div class="pom-sessions-done" id="pomDots">
+        <button class="pom-session-task" id="pomTaskLabel" onclick="switchView('tasks')" aria-label="Link a task to this focus session">📌 Click to link a task</button>
+        <div class="pom-sessions-done" id="pomDots" aria-label="0 focus sessions completed">
           <div class="session-dot"></div><div class="session-dot"></div>
           <div class="session-dot"></div><div class="session-dot"></div>
         </div>
+        <div id="pomAnnouncer" aria-live="polite" class="sr-only"></div>
       </div>
     </div>
 
     <!-- HABITS -->
-    <div class="view" id="view-habits">
+    <div class="view" id="view-habits" role="region" aria-label="Habits tracker">
       <div class="habit-list" id="habitList">
-        <div class="empty-state"><div class="empty-state-icon">🌱</div><div class="empty-state-text">No habits yet.<br>Add your first habit below.</div></div>
+        <div class="empty-state"><div class="empty-state-icon" aria-hidden="true">🌱</div><div class="empty-state-text">No habits yet.<br>Add your first habit below.</div></div>
       </div>
       <button class="btn-add" style="margin-top:1.25rem;" onclick="openHabitModal()">+ New habit</button>
     </div>
 
     <!-- PLANNER -->
-    <div class="view" id="view-planner">
+    <div class="view" id="view-planner" role="region" aria-label="Weekly planner">
       <div class="planner-header" id="planner-header"></div>
       <div class="planner-grid" id="planner-grid"></div>
     </div>
 
     <!-- ANALYTICS -->
-    <div class="view" id="view-analytics">
+    <div class="view" id="view-analytics" role="region" aria-label="Analytics">
       <div class="dash-grid">
         <div class="stat-card">
-          <div class="stat-card-val" id="analyticsBestStreak">—</div>
           <div class="stat-card-label">Best streak</div>
+          <div class="stat-card-val" id="analyticsBestStreak">—</div>
           <div class="stat-card-sub">across all habits</div>
         </div>
         <div class="stat-card">
-          <div class="stat-card-val" id="analyticsTasksWeek">—</div>
           <div class="stat-card-label">Tasks this week</div>
+          <div class="stat-card-val" id="analyticsTasksWeek">—</div>
           <div class="stat-card-sub">completed last 7 days</div>
         </div>
         <div class="stat-card">
-          <div class="stat-card-val" id="analyticsFocusToday">—</div>
           <div class="stat-card-label">Focus today</div>
+          <div class="stat-card-val" id="analyticsFocusToday">—</div>
           <div class="stat-card-sub">pomodoro time</div>
         </div>
       </div>
       <div class="dash-row">
         <div class="panel">
-          <div class="panel-title">Tasks completed — last 7 days</div>
+          <h2 class="panel-title">Tasks completed — last 7 days</h2>
           <div id="analyticsTasksChart"></div>
         </div>
         <div class="panel">
-          <div class="panel-title">Habit completion — last 7 days</div>
+          <h2 class="panel-title">Habit completion — last 7 days</h2>
           <div id="analyticsHabitsChart"></div>
         </div>
       </div>
       <div class="dash-row" style="margin-top:1rem;">
         <div class="panel">
-          <div class="panel-title">Focus time — last 7 days</div>
+          <h2 class="panel-title">Focus time — last 7 days</h2>
           <div id="analyticsFocusChart"></div>
         </div>
         <div class="panel">
-          <div class="panel-title">Tasks by course</div>
+          <h2 class="panel-title">Tasks by course</h2>
           <div id="analyticsCourseChart"></div>
         </div>
       </div>
@@ -497,29 +547,29 @@
         <div class="cx-section">
           <div class="cx-label">Accent color</div>
           <div class="cx-grid" id="colorSwatches">
-            <button class="swatch active" data-color="default" style="background:#4a7c59;" onclick="setColor('default')" aria-label="Default green accent"></button>
-            <button class="swatch" data-color="forest" style="background:#3d7a4f;" onclick="setColor('forest')" aria-label="Forest green accent"></button>
-            <button class="swatch" data-color="ocean" style="background:#2e7ba8;" onclick="setColor('ocean')" aria-label="Ocean blue accent"></button>
-            <button class="swatch" data-color="lavender" style="background:#7c5cbf;" onclick="setColor('lavender')" aria-label="Lavender accent"></button>
-            <button class="swatch" data-color="rose" style="background:#b8456a;" onclick="setColor('rose')" aria-label="Rose accent"></button>
-            <button class="swatch" data-color="amber" style="background:#c47d0e;" onclick="setColor('amber')" aria-label="Amber accent"></button>
-            <button class="swatch" data-color="mono" style="background:#555;" onclick="setColor('mono')" aria-label="Monochrome accent"></button>
+            <button class="swatch active" data-color="default" style="background:#4a7c59;" onclick="setColor('default')" aria-label="Default green accent" aria-pressed="true"></button>
+            <button class="swatch" data-color="forest" style="background:#3d7a4f;" onclick="setColor('forest')" aria-label="Forest green accent" aria-pressed="false"></button>
+            <button class="swatch" data-color="ocean" style="background:#2e7ba8;" onclick="setColor('ocean')" aria-label="Ocean blue accent" aria-pressed="false"></button>
+            <button class="swatch" data-color="lavender" style="background:#7c5cbf;" onclick="setColor('lavender')" aria-label="Lavender accent" aria-pressed="false"></button>
+            <button class="swatch" data-color="rose" style="background:#b8456a;" onclick="setColor('rose')" aria-label="Rose accent" aria-pressed="false"></button>
+            <button class="swatch" data-color="amber" style="background:#c47d0e;" onclick="setColor('amber')" aria-label="Amber accent" aria-pressed="false"></button>
+            <button class="swatch" data-color="mono" style="background:#555;" onclick="setColor('mono')" aria-label="Monochrome accent" aria-pressed="false"></button>
           </div>
         </div>
         <div class="cx-section">
           <div class="cx-label">Font style</div>
           <div class="cx-grid">
-            <button class="font-btn active" data-font="serif" onclick="setFont('serif')">Serif <span style="opacity:.5;font-size:.75rem;">Aa</span></button>
-            <button class="font-btn" data-font="sans" onclick="setFont('sans')" style="font-family:'DM Sans',sans-serif;">Sans <span style="opacity:.5;font-size:.75rem;">Aa</span></button>
-            <button class="font-btn" data-font="mono" onclick="setFont('mono')" style="font-family:'Courier New',monospace;">Mono <span style="opacity:.5;font-size:.75rem;">Aa</span></button>
+            <button class="font-btn active" data-font="serif" onclick="setFont('serif')" aria-pressed="true">Serif <span style="opacity:.5;font-size:.75rem;">Aa</span></button>
+            <button class="font-btn" data-font="sans" onclick="setFont('sans')" style="font-family:'DM Sans',sans-serif;" aria-pressed="false">Sans <span style="opacity:.5;font-size:.75rem;">Aa</span></button>
+            <button class="font-btn" data-font="mono" onclick="setFont('mono')" style="font-family:'Courier New',monospace;" aria-pressed="false">Mono <span style="opacity:.5;font-size:.75rem;">Aa</span></button>
           </div>
         </div>
         <div class="cx-section">
           <div class="cx-label">Layout density</div>
           <div class="cx-grid">
-            <button class="density-btn" data-density="compact" onclick="setDensity('compact')">Compact</button>
-            <button class="density-btn active" data-density="default" onclick="setDensity('default')">Default</button>
-            <button class="density-btn" data-density="spacious" onclick="setDensity('spacious')">Spacious</button>
+            <button class="density-btn" data-density="compact" onclick="setDensity('compact')" aria-pressed="false">Compact</button>
+            <button class="density-btn active" data-density="default" onclick="setDensity('default')" aria-pressed="true">Default</button>
+            <button class="density-btn" data-density="spacious" onclick="setDensity('spacious')" aria-pressed="false">Spacious</button>
           </div>
         </div>
         <div class="cx-section">
@@ -541,8 +591,8 @@
 
 <!-- ADD TASK MODAL -->
 <div class="modal-overlay" id="taskModal">
-  <div class="modal">
-    <div class="modal-title">Add a task</div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+    <div class="modal-title" id="taskModalTitle">Add a task</div>
     <div class="modal-field"><label class="modal-label" for="modalTaskTitle">Title</label><input class="modal-input" type="text" id="modalTaskTitle" placeholder="What needs to get done?"></div>
     <div class="modal-field"><label class="modal-label" for="modalTaskCourse">Course (optional)</label><select class="modal-select" id="modalTaskCourse"><option value="">No course</option></select></div>
     <div class="modal-field"><label class="modal-label" for="modalTaskDue">Due date (optional)</label><input class="modal-input" type="date" id="modalTaskDue"></div>
@@ -556,8 +606,8 @@
 
 <!-- ADD HABIT MODAL -->
 <div class="modal-overlay" id="habitModal">
-  <div class="modal">
-    <div class="modal-title">New habit</div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="habitModalTitle">
+    <div class="modal-title" id="habitModalTitle">New habit</div>
     <div class="modal-field"><label class="modal-label" for="habitName">Habit name</label><input class="modal-input" type="text" id="habitName" placeholder="e.g. Study 2 hours, Read 30 min…"></div>
     <div class="modal-field"><label class="modal-label" for="habitEmoji">Emoji icon</label><input class="modal-input" type="text" id="habitEmoji" placeholder="📚" maxlength="2" style="width:80px;"></div>
     <div class="modal-actions">
@@ -579,6 +629,16 @@ function toggleTheme() {
   const next = isDark ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('flowdesk-theme', next);
+}
+
+function toggleMobileNav() {
+  const open = document.body.classList.toggle('nav-open');
+  document.getElementById('hamburgerBtn').setAttribute('aria-expanded', open);
+}
+function closeMobileNav() {
+  document.body.classList.remove('nav-open');
+  const btn = document.getElementById('hamburgerBtn');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
 }
 
 // ── AUTH GUARD + INIT ──────────────────────────────────────
@@ -631,6 +691,7 @@ let currentView = 'dashboard';
 const viewTitles = { dashboard:'Dashboard', tasks:'Tasks', pomodoro:'Pomodoro', habits:'Habits', planner:'Weekly Planner', customize:'Customize', analytics:'Focus Analytics' };
 
 function switchView(v) {
+  closeMobileNav();
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById(`view-${v}`).classList.add('active');
@@ -644,17 +705,20 @@ function switchView(v) {
   } else {
     document.getElementById('viewTitle').textContent = viewTitles[v];
   }
+  document.title = 'FlowDesk \u2014 ' + (viewTitles[v] || 'FlowDesk');
   document.getElementById('btnAddMain').style.display = 'flex';
   if (v === 'planner') renderPlanner();
   if (v === 'analytics') renderAnalytics();
+  const title = document.getElementById('viewTitle');
+  if (title) title.focus();
 }
 
 // ── TASKS ──────────────────────────────────────────────────
 let taskFilter = 'all';
 function filterTasks(f, btn) {
   taskFilter = f;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active'); renderTasks();
+  document.querySelectorAll('.filter-chip').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-pressed', 'false'); });
+  btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); renderTasks();
 }
 
 function populateCourseSelects() {
@@ -671,16 +735,16 @@ function renderTasks(container = 'taskListContainer') {
   else if (taskFilter === 'pending') filtered = tasks.filter(t => !t.done);
   else if (taskFilter === 'done') filtered = tasks.filter(t => t.done);
   const el = document.getElementById(container); if (!el) return;
-  if (!filtered.length) { el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-text">${taskFilter==='done'?'No completed tasks yet.':'No tasks here!'}</div></div>`; return; }
+  if (!filtered.length) { el.innerHTML = `<div class="empty-state"><div class="empty-state-icon" aria-hidden="true">✅</div><div class="empty-state-text">${taskFilter==='done'?'No completed tasks yet.':'No tasks here!'}</div></div>`; return; }
   el.innerHTML = filtered.map(t => {
     const course = courses.find(c => c.id === t.course_id);
     const isOverdue = t.due_date && t.due_date < today && !t.done;
     return `<div class="task-row ${t.done?'done':''}" id="task-${t.id}">
-      <button class="task-check-btn ${t.done?'done':''}" onclick="toggleTask('${t.id}')"></button>
+      <button class="task-check-btn ${t.done?'done':''}" onclick="toggleTask('${t.id}')" aria-label="${t.done?'Mark incomplete':'Mark complete'}: ${escapeHtml(t.title)}" title="Mark done"></button>
       ${course?`<div class="task-course-dot" style="background:${course.color};border-radius:50%;"></div>`:''}
       <div class="task-body"><div class="task-title">${escapeHtml(t.title)}</div>${course?`<div class="task-meta">${escapeHtml(course.name)}</div>`:''}</div>
-      ${t.due_date?`<div class="task-due ${isOverdue?'overdue':''}">${isOverdue?'⚠ ':''}${formatDate(t.due_date)}</div>`:''}
-      <button class="task-delete" onclick="deleteTask('${t.id}')">×</button>
+      ${t.due_date?`<div class="task-due ${isOverdue?'overdue':''}">${isOverdue?'<span aria-label="Overdue" role="img">⚠</span> ':''}${formatDate(t.due_date)}</div>`:''}
+      <button class="task-delete" onclick="deleteTask('${t.id}')" aria-label="Delete task: ${escapeHtml(t.title)}" title="Delete task">×</button>
     </div>`;
   }).join('');
   const pendingCount = tasks.filter(t => !t.done).length;
@@ -707,7 +771,7 @@ async function toggleTask(id) {
 }
 
 async function deleteTask(id) {
-  tasks = tasks.filter(t => t.id !== id); renderTasks(); updateDashStats();
+  tasks = tasks.filter(t => t.id !== id); renderTasks(); renderPlanner(); updateDashStats();
   await sb.from('tasks').delete().eq('id', id);
 }
 
@@ -733,6 +797,12 @@ async function saveTaskFromModal() {
 async function insertTask(title, dueDate, courseId) {
   const { data, error } = await sb.from('tasks').insert({ user_id: currentUser.id, title, due_date: dueDate||null, course_id: courseId||null, done: false, created_at: toLocalISOString() }).select().single();
   if (!error && data) { tasks.unshift(data); renderTasks(); updateDashStats(); renderPlanner(); }
+  else {
+    const t = document.getElementById('taskErrorToast');
+    t.textContent = 'Could not save task. Please try again.';
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3000);
+  }
 }
 
 function updateDashStats() {
@@ -741,8 +811,8 @@ function updateDashStats() {
   document.getElementById('dashTasksDone').textContent = `${doneTasks.length} completed`;
   const dash = document.getElementById('dashTaskList');
   const recent = tasks.filter(t => !t.done).slice(0, 4);
-  if (!recent.length) { dash.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🎉</div><div class="empty-state-text">All done!</div></div>`; return; }
-  dash.innerHTML = recent.map(t => `<div class="task-row" style="padding:0.55rem 0.75rem;margin-bottom:0.4rem;"><button class="task-check-btn" onclick="toggleTask('${t.id}')"></button><div class="task-title" style="font-size:0.85rem;">${escapeHtml(t.title)}</div></div>`).join('');
+  if (!recent.length) { dash.innerHTML = `<div class="empty-state"><div class="empty-state-icon" aria-hidden="true">🎉</div><div class="empty-state-text">All done!</div></div>`; return; }
+  dash.innerHTML = recent.map(t => `<div class="task-row" style="padding:0.55rem 0.75rem;margin-bottom:0.4rem;"><button class="task-check-btn" onclick="toggleTask('${t.id}')" aria-label="${t.done?'Mark incomplete':'Mark complete'}: ${escapeHtml(t.title)}"></button><div class="task-title" style="font-size:0.85rem;">${escapeHtml(t.title)}</div></div>`).join('');
 }
 
 // ── POMODORO ───────────────────────────────────────────────
@@ -756,7 +826,10 @@ function setPomMode(mode, btn) {
   document.querySelectorAll('.pom-mode-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
   const secs = mode==='focus' ? (profile?.pom_minutes||25)*60 : pomModes[mode]*60;
   pomTotalSecs = secs; pomRemaining = secs; updatePomDisplay();
-  document.getElementById('pomLabel').textContent = mode==='focus'?'FOCUS SESSION':mode==='short'?'SHORT BREAK':'LONG BREAK';
+  const pomLabelEl = document.getElementById('pomLabel');
+  const pomLabelText = mode==='focus'?'FOCUS SESSION':mode==='short'?'SHORT BREAK':'LONG BREAK';
+  pomLabelEl.textContent = pomLabelText;
+  pomLabelEl.setAttribute('aria-label', pomLabelText.charAt(0).toUpperCase() + pomLabelText.slice(1).toLowerCase());
 }
 
 function updatePomDisplay() {
@@ -766,12 +839,15 @@ function updatePomDisplay() {
   document.getElementById('pomArc').style.strokeDashoffset = pomCircumference * (1 - pomRemaining/pomTotalSecs);
 }
 
+function pomAnnounce(msg) { const el = document.getElementById('pomAnnouncer'); if (el) { el.textContent = ''; setTimeout(() => { el.textContent = msg; }, 50); } }
+
 function togglePom() {
   if (pomRunning) {
     pomRunning=false; clearInterval(pomInterval);
     document.getElementById('pomPlayBtn').textContent='▶'; document.getElementById('pomPlayBtn').setAttribute('aria-label','Start timer'); document.getElementById('pomRingWrap').classList.remove('pom-running');
   } else {
     pomRunning=true; document.getElementById('pomPlayBtn').textContent='⏸'; document.getElementById('pomPlayBtn').setAttribute('aria-label','Pause timer'); document.getElementById('pomRingWrap').classList.add('pom-running');
+    pomAnnounce(pomMode==='focus' ? 'Focus session started' : 'Break started');
     pomInterval = setInterval(() => {
       pomRemaining--; updatePomDisplay();
       if (pomMode==='focus') { focusSecondsToday++; document.getElementById('dashFocusTime').textContent = focusSecondsToday>=3600?`${(focusSecondsToday/3600).toFixed(1)}h`:`${Math.floor(focusSecondsToday/60)}m`; }
@@ -781,8 +857,8 @@ function togglePom() {
 }
 
 function completePom() {
-  pomRunning=false; clearInterval(pomInterval); document.getElementById('pomPlayBtn').textContent='▶'; document.getElementById('pomPlayBtn').setAttribute('aria-label','Start timer');
-  if (pomMode==='focus') { pomSessionsDone++; setFocusLog(pomTotalSecs); const dots=document.querySelectorAll('.session-dot'); if (dots[pomSessionsDone-1]) dots[pomSessionsDone-1].classList.add('done'); }
+  pomRunning=false; clearInterval(pomInterval); document.getElementById('pomPlayBtn').textContent='▶'; document.getElementById('pomPlayBtn').setAttribute('aria-label','Start timer'); pomAnnounce('Session complete');
+  if (pomMode==='focus') { pomSessionsDone++; setFocusLog(pomTotalSecs); const dots=document.querySelectorAll('.session-dot'); if (dots[pomSessionsDone-1]) dots[pomSessionsDone-1].classList.add('done'); const pomDotsEl=document.getElementById('pomDots'); if (pomDotsEl) pomDotsEl.setAttribute('aria-label', pomSessionsDone+' focus session'+(pomSessionsDone===1?'':'s')+' completed'); }
   try { const ctx=new AudioContext(),osc=ctx.createOscillator(),gain=ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value=880; gain.gain.setValueAtTime(0.3,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.8); osc.start(); osc.stop(ctx.currentTime+0.8); } catch(e){}
   if (pomMode==='focus') { const bm=pomSessionsDone%4===0?'long':'short'; setPomMode(bm,document.querySelector(`.pom-mode-btn:nth-child(${bm==='short'?2:3})`)); }
   else { setPomMode('focus',document.querySelector('.pom-mode-btn:first-child')); }
@@ -794,12 +870,12 @@ function skipPom() { completePom(); }
 // ── HABITS ─────────────────────────────────────────────────
 function renderHabits() {
   const el = document.getElementById('habitList');
-  if (!habits.length) { el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">🌱</div><div class="empty-state-text">No habits yet.<br>Add your first habit below.</div></div>`; return; }
+  if (!habits.length) { el.innerHTML=`<div class="empty-state"><div class="empty-state-icon" aria-hidden="true">🌱</div><div class="empty-state-text">No habits yet.<br>Add your first habit below.</div></div>`; return; }
   const days=['M','T','W','T','F','S','S'];
   el.innerHTML = habits.map(h => {
     const completions=h.completions||[], streak=calcStreak(completions);
     document.getElementById('dashStreak').textContent=`${streak}🔥`;
-    return `<div class="habit-item"><div style="font-size:1.5rem;">${h.emoji||'📚'}</div><div class="habit-info"><div class="habit-name">${escapeHtml(h.name)}</div><div class="habit-streak">${streak>0?`🔥 ${streak}-day streak`:'Start your streak!'}</div></div><div class="habit-week">${days.map((d,i)=>{ const date=getWeekDate(i),done=completions.includes(date); return `<div class="hday ${done?'done':''}" onclick="toggleHabitDay('${h.id}','${date}')" title="${date}">${done?'':d}</div>`; }).join('')}</div></div>`;
+    return `<div class="habit-item"><div style="font-size:1.5rem;">${h.emoji||'📚'}</div><div class="habit-info"><div class="habit-name">${escapeHtml(h.name)}</div><div class="habit-streak" ${streak>0?`aria-label="${streak} day streak"`:'aria-label="No streak yet"'}>${streak>0?`🔥 ${streak}-day streak`:'Start your streak!'}</div></div><div class="habit-week">${days.map((d,i)=>{ const date=getWeekDate(i),done=completions.includes(date); return `<div class="hday ${done?'done':''}" role="checkbox" aria-checked="${done}" tabindex="0" aria-label="${d} ${date}${done?' (complete)':''}" onclick="toggleHabitDay('${h.id}','${date}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleHabitDay('${h.id}','${date}')}" title="${date}">${done?'':d}</div>`; }).join('')}</div></div>`;
   }).join('');
 }
 
@@ -832,9 +908,33 @@ async function saveHabit() {
 }
 
 // ── MODALS ──────────────────────────────────────────────────
-function openModal(id) { document.getElementById(id).classList.add('visible'); }
-function closeModal(id) { document.getElementById(id).classList.remove('visible'); }
+let _focusTrapHandler = null;
+
+function openModal(id) {
+  const overlay = document.getElementById(id);
+  overlay.classList.add('visible');
+  const focusable = Array.from(overlay.querySelectorAll('input, select, textarea, button, [tabindex]:not([tabindex="-1"])'));
+  const first = focusable[0], last = focusable[focusable.length - 1];
+  _focusTrapHandler = function(e) {
+    if (e.key !== 'Tab') return;
+    if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+    else            { if (document.activeElement === last)  { e.preventDefault(); first.focus(); } }
+  };
+  document.addEventListener('keydown', _focusTrapHandler);
+  if (first) first.focus();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('visible');
+  if (_focusTrapHandler) { document.removeEventListener('keydown', _focusTrapHandler); _focusTrapHandler = null; }
+}
 document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target===o) o.classList.remove('visible'); }));
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  ['taskModal', 'habitModal'].forEach(id => {
+    if (document.getElementById(id)?.classList.contains('visible')) closeModal(id);
+  });
+});
 
 // ── CUSTOMIZE ──────────────────────────────────────────────
 function setMode(mode) {
@@ -843,9 +943,9 @@ function setMode(mode) {
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(`mode${mode.charAt(0).toUpperCase()+mode.slice(1)}`).classList.add('active');
 }
-function setColor(color) { document.documentElement.setAttribute('data-color',color==='default'?'':color); localStorage.setItem('flowdesk-color',color); document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.color===color)); }
-function setFont(font) { document.documentElement.setAttribute('data-font',font); localStorage.setItem('flowdesk-font',font); document.querySelectorAll('.font-btn').forEach(b=>b.classList.toggle('active',b.dataset.font===font)); }
-function setDensity(density) { document.documentElement.setAttribute('data-density',density==='default'?'':density); localStorage.setItem('flowdesk-density',density); document.querySelectorAll('.density-btn').forEach(b=>b.classList.toggle('active',b.dataset.density===density)); }
+function setColor(color) { document.documentElement.setAttribute('data-color',color==='default'?'':color); localStorage.setItem('flowdesk-color',color); document.querySelectorAll('.swatch').forEach(s=>{ s.classList.toggle('active',s.dataset.color===color); s.setAttribute('aria-pressed', s.dataset.color===color ? 'true' : 'false'); }); }
+function setFont(font) { document.documentElement.setAttribute('data-font',font); localStorage.setItem('flowdesk-font',font); document.querySelectorAll('.font-btn').forEach(b=>{ b.classList.toggle('active',b.dataset.font===font); b.setAttribute('aria-pressed', b.dataset.font===font ? 'true' : 'false'); }); }
+function setDensity(density) { document.documentElement.setAttribute('data-density',density==='default'?'':density); localStorage.setItem('flowdesk-density',density); document.querySelectorAll('.density-btn').forEach(b=>{ b.classList.toggle('active',b.dataset.density===density); b.setAttribute('aria-pressed', b.dataset.density===density ? 'true' : 'false'); }); }
 
 let particlesOn=true;
 function toggleParticleEffect() { particlesOn=!particlesOn; document.getElementById('toggleParticlesBtn').classList.toggle('on',particlesOn); document.getElementById('toggleParticlesBtn').setAttribute('aria-pressed', String(particlesOn)); const canvas=document.getElementById('sidebarParticles'); if(canvas) canvas.style.opacity=particlesOn?'0.4':'0'; localStorage.setItem('flowdesk-particles',particlesOn); }
@@ -863,6 +963,8 @@ function restoreCustomize() {
   const particles=localStorage.getItem('flowdesk-particles'), anims=localStorage.getItem('flowdesk-animations');
   setColor(color); setFont(font); setDensity(density);
   if(particles==='false') toggleParticleEffect(); if(anims==='false') toggleAnimEffect();
+  document.getElementById('toggleParticlesBtn').setAttribute('aria-pressed', particlesOn ? 'true' : 'false');
+  document.getElementById('toggleAnimBtn').setAttribute('aria-pressed', animationsOn ? 'true' : 'false');
   const t=localStorage.getItem('flowdesk-theme')||'light', k=t==='dark'?'modeDark':t==='system'?'modeSystem':'modeLight';
   document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active')); const mel=document.getElementById(k); if(mel) mel.classList.add('active');
 }
@@ -903,7 +1005,8 @@ function gcalGetToken() {
   return (!token||Date.now()>expiry) ? null : token;
 }
 
-function gcalConnect() {
+function gcalConnect(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Connecting\u2026'; }
   window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams({ client_id:GCAL_CLIENT_ID, redirect_uri:GCAL_REDIRECT, response_type:'token', scope:GCAL_SCOPE, include_granted_scopes:'true' })}`;
 }
 
@@ -963,7 +1066,7 @@ function renderPlannerHeader(monday, sunday) {
     ${connected ? `<div class="planner-gcal-status"><span class="planner-gcal-dot"></span>Google Calendar connected</div>
       <button class="planner-sync-btn" onclick="gcalFetchEvents()">&#x1F504; Sync</button>
       <button class="planner-disconnect-btn" onclick="gcalDisconnect()">Disconnect</button>` :
-      `<button class="planner-connect-btn" onclick="gcalConnect()">Connect Google Calendar</button>`}`;
+      `<button class="planner-connect-btn" onclick="gcalConnect(this)">Connect Google Calendar</button>`}`;
 }
 
 function renderPlanner() {
@@ -1006,7 +1109,7 @@ function renderPlanner() {
 
     const col = document.createElement('div');
     col.className = 'planner-day'+(isToday?' today':'');
-    col.innerHTML = `<div class="planner-day-header"><span class="planner-day-name">${DAY_NAMES[i]}</span><span class="planner-day-date">${day.getDate()}</span></div>${gcalHtml}<div class="planner-tasks">${tasksHtml}</div><div class="planner-quick-add"><input type="text" id="planner-input-${dateStr}" placeholder="Add task…" onkeydown="if(event.key==='Enter')plannerAddTask('${dateStr}')"><button onclick="plannerAddTask('${dateStr}')">+</button></div>`;
+    col.innerHTML = `<div class="planner-day-header"><span class="planner-day-name">${DAY_NAMES[i]}</span><span class="planner-day-date">${day.getDate()}</span></div>${gcalHtml}<div class="planner-tasks">${tasksHtml}</div><div class="planner-quick-add"><input type="text" id="planner-input-${dateStr}" placeholder="Add task…" aria-label="Add task for ${DAY_NAMES[i]}" onkeydown="if(event.key==='Enter')plannerAddTask('${dateStr}')"><button onclick="plannerAddTask('${dateStr}')" aria-label="Add task for ${DAY_NAMES[i]}">+</button></div>`;
     grid.appendChild(col);
   }
 }
@@ -1038,7 +1141,9 @@ document.querySelectorAll('.btn-add').forEach(btn => btn.addEventListener('click
     particles.forEach(p => { p.x+=p.vx; p.y+=p.vy; if(p.y<-5){p.y=canvas.height+5;p.x=Math.random()*canvas.width;} ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=`rgba(${color},${p.alpha})`; ctx.fill(); });
     requestAnimationFrame(draw);
   }
-  draw();
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    draw();
+  }
 })();
 
 updatePomDisplay();
@@ -1046,7 +1151,7 @@ updatePomDisplay();
 // ── FOCUS ANALYTICS ────────────────────────────────────────
 function buildBarChart(rows, unit) {
   if (!rows || rows.length === 0 || rows.every(r => r.value === 0)) {
-    return '<div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">No data yet.</div></div>';
+    return '<div class="empty-state"><div class="empty-state-icon" aria-hidden="true">📊</div><div class="empty-state-text">No data yet.</div></div>';
   }
   return rows.map(row => {
     const pct = row.max === 0 ? 0 : Math.min(100, Math.round((row.value / row.max) * 100));
@@ -1084,7 +1189,7 @@ function renderAnalytics() {
 
   // Habits chart
   if (!habits.length) {
-    document.getElementById('analyticsHabitsChart').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><div class="empty-state-text">No data yet.</div></div>';
+    document.getElementById('analyticsHabitsChart').innerHTML = '<div class="empty-state"><div class="empty-state-icon" aria-hidden="true">📊</div><div class="empty-state-text">No data yet.</div></div>';
   } else {
     document.getElementById('analyticsHabitsChart').innerHTML = buildBarChart(
       habits.map(h => ({label: (h.emoji||'') + ' ' + escapeHtml(h.name).slice(0,10), value: (h.completions||[]).filter(d => last7.includes(d)).length, max: 7})), '/7');
@@ -1107,7 +1212,7 @@ function renderAnalytics() {
   courseRows.forEach(r => r.max = courseMax);
   document.getElementById('analyticsCourseChart').innerHTML = courseRows.length
     ? buildBarChart(courseRows, ' tasks')
-    : '<div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-text">No completed tasks by course yet.</div></div>';
+    : '<div class="empty-state"><div class="empty-state-icon" aria-hidden="true">📚</div><div class="empty-state-text">No completed tasks by course yet.</div></div>';
 }
 </script>
 </body>

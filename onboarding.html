@@ -220,6 +220,22 @@
     transition: color 0.2s;
   }
   .ob-skip:hover { color: var(--ink); }
+
+  @media (max-width: 480px) {
+    body { padding: 0.75rem; }
+    .ob-wrap { padding: 1rem 0 3rem; }
+    .ob-card { padding: 1.5rem 1.25rem; border-radius: 16px; }
+    .ob-title { font-size: 1.6rem; }
+    .chip-grid { grid-template-columns: 1fr 1fr; }
+    .goal-grid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ob-step { animation: none; }
+    .ob-step.exit { animation: none; }
+    .error-msg { animation: none; }
+    .spinner { animation: none; }
+    * { transition-duration: 0.01ms !important; }
+  }
 </style>
 </head>
 <body>
@@ -227,10 +243,10 @@
 <div class="ob-wrap">
   <div class="ob-header">
     <a href="index.html" class="ob-logo">Flow<span>Desk</span></a>
-    <div class="ob-step-indicator" id="stepIndicator">Step 1 of 4</div>
+    <div class="ob-step-indicator" id="stepIndicator" aria-live="polite">Step 1 of 4</div>
   </div>
 
-  <div class="ob-progress">
+  <div class="ob-progress" role="progressbar" aria-valuenow="1" aria-valuemax="4" aria-label="Step 1 of 4" id="obProgress">
     <div class="ob-progress-fill" id="progressFill" style="width: 25%"></div>
   </div>
 
@@ -238,7 +254,7 @@
   <div class="ob-step active" id="step1">
     <div class="ob-eyebrow">Welcome</div>
     <h1 class="ob-title">What are you<br><em>studying?</em></h1>
-    <p class="ob-subtitle">Select your field so we can suggest relevant features and templates.</p>
+    <p class="ob-subtitle">Your field shapes your FlowDesk — we'll surface the tools that matter most to you.</p>
     <div class="chip-grid" id="fieldChips">
       <div class="chip" data-val="stem">STEM</div>
       <div class="chip" data-val="business">Business</div>
@@ -259,7 +275,7 @@
   <div class="ob-step" id="step2">
     <div class="ob-eyebrow">Your classes</div>
     <h1 class="ob-title">Add your<br><em>courses.</em></h1>
-    <p class="ob-subtitle">We'll organize your tasks by class. Add up to 8 courses — you can always edit later.</p>
+    <p class="ob-subtitle">Add your classes and every task, deadline, and note will automatically be organized for you.</p>
     <div class="ob-input-group">
       <div class="ob-input-row">
         <input class="ob-input" type="text" id="courseInput" placeholder="e.g. Calculus II, English 101…" maxlength="50">
@@ -278,7 +294,7 @@
   <div class="ob-step" id="step3">
     <div class="ob-eyebrow">Your goals</div>
     <h1 class="ob-title">What do you want<br><em>to achieve?</em></h1>
-    <p class="ob-subtitle">Pick all that apply. We'll personalize your dashboard accordingly.</p>
+    <p class="ob-subtitle">Tell us what you're aiming for — your dashboard will be waiting with the right tools.</p>
     <div class="goal-grid" id="goalGrid">
       <div class="goal-card" data-val="grades" onclick="toggleGoal(this)">
         <div class="goal-icon">🎯</div>
@@ -321,7 +337,7 @@
   <div class="ob-step" id="step4">
     <div class="ob-eyebrow">Almost done</div>
     <h1 class="ob-title">How many hours<br><em>per day?</em></h1>
-    <p class="ob-subtitle">Set a daily study target. FlowDesk will remind you and track your progress.</p>
+    <p class="ob-subtitle">Protect your study time. FlowDesk will track your hours so you don't have to count.</p>
 
     <div class="slider-wrap">
       <div class="slider-label">
@@ -345,6 +361,7 @@
         <div class="spinner" id="finishSpinner" style="display:none; width:16px; height:16px; border-radius:50%; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; animation:spin 0.7s linear infinite;"></div>
         Let's go 🚀
       </button>
+      <div id="onboardingError" style="display:none;color:var(--coral);font-size:0.875rem;margin-top:0.5rem;text-align:center;"></div>
     </div>
   </div>
 </div>
@@ -352,6 +369,11 @@
 <script>
 // ── HELPERS ────────────────────────────────────────────────
 function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showOnboardingError(msg) {
+  const el = document.getElementById('onboardingError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
 
 // ── THEME ──────────────────────────────────────────────────
 const saved = localStorage.getItem('flowdesk-theme');
@@ -402,6 +424,11 @@ function goStep(n) {
     next.classList.add('active');
     document.getElementById('stepIndicator').textContent = `Step ${n} of ${totalSteps}`;
     document.getElementById('progressFill').style.width = `${(n / totalSteps) * 100}%`;
+    const progressEl = document.getElementById('obProgress');
+    if (progressEl) {
+      progressEl.setAttribute('aria-valuenow', n);
+      progressEl.setAttribute('aria-label', `Step ${n} of 4`);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 280);
 }
@@ -475,8 +502,10 @@ function toLocalISOString(d = new Date()) {
 async function finishOnboarding() {
   if (!currentUser) return;
   const btn = document.getElementById('btnFinish');
+  const spinner = document.getElementById('finishSpinner');
   btn.disabled = true;
-  document.getElementById('finishSpinner').style.display = 'block';
+  spinner.style.display = 'block';
+  document.getElementById('onboardingError').style.display = 'none';
 
   // Save profile + preferences to Supabase
   const { error } = await sb.from('profiles').upsert({
@@ -493,21 +522,29 @@ async function finishOnboarding() {
     updated_at: toLocalISOString(),
   });
 
-  // Save courses
+  if (error) {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+    showOnboardingError('Something went wrong saving your profile. Please try again.');
+    return;
+  }
+
+  // Save courses (only runs after confirmed profile upsert success)
   if (state.courses.length > 0) {
     const rows = state.courses.map((name, i) => ({
       user_id: currentUser.id,
       name,
       color: ['#4a7c59','#c9820a','#d85a30','#7c4a7c','#2d5238','#8b6914','#c04030','#3a6b8a'][i % 8],
     }));
-    await sb.from('courses').insert(rows);
-  }
-
-  if (error) {
-    btn.disabled = false;
-    document.getElementById('finishSpinner').style.display = 'none';
-    alert('Something went wrong. Please try again.');
-    return;
+    const { error: courseError } = await sb.from('courses').insert(rows);
+    if (courseError) {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      showOnboardingError('Profile saved, but courses could not be added. You can add them in the dashboard.');
+      // Profile + onboarding_done already saved — redirect after showing message
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 2500);
+      return;
+    }
   }
 
   window.location.href = 'dashboard.html';

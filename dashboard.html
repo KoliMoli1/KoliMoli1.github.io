@@ -764,16 +764,20 @@ function formatDate(d) {
 
 async function toggleTask(id) {
   const task = tasks.find(t => t.id === id); if (!task) return;
+  const prev = task.done;
   task.done = !task.done;
   const row = document.getElementById(`task-${id}`);
   if (row && task.done) { row.classList.add('completing'); setTimeout(() => { renderTasks(); updateDashStats(); renderPlanner(); }, 350); }
   else { renderTasks(); updateDashStats(); renderPlanner(); }
-  await sb.from('tasks').update({ done: task.done, updated_at: toLocalISOString() }).eq('id', id);
+  const { error } = await sb.from('tasks').update({ done: task.done, updated_at: toLocalISOString() }).eq('id', id);
+  if (error) { task.done = prev; renderTasks(); updateDashStats(); renderPlanner(); }
 }
 
 async function deleteTask(id) {
+  const prev = tasks.slice();
   tasks = tasks.filter(t => t.id !== id); renderTasks(); renderPlanner(); updateDashStats();
-  await sb.from('tasks').delete().eq('id', id);
+  const { error } = await sb.from('tasks').delete().eq('id', id);
+  if (error) { tasks = prev; renderTasks(); renderPlanner(); updateDashStats(); }
 }
 
 function openAddModal() {
@@ -810,6 +814,8 @@ function updateDashStats() {
   const doneTasks = tasks.filter(t => t.done);
   document.getElementById('dashTasksToday').textContent = tasks.filter(t => !t.done).length;
   document.getElementById('dashTasksDone').textContent = `${doneTasks.length} completed`;
+  const maxStreak = habits.reduce((max, h) => Math.max(max, calcStreak(h.completions||[])), 0);
+  document.getElementById('dashStreak').textContent = `${maxStreak}🔥`;
   const dash = document.getElementById('dashTaskList');
   const recent = tasks.filter(t => !t.done).slice(0, 4);
   if (!recent.length) { dash.innerHTML = `<div class="empty-state"><div class="empty-state-icon" aria-hidden="true">🎉</div><div class="empty-state-text">All done!</div></div>`; return; }
@@ -875,7 +881,6 @@ function renderHabits() {
   const days=['M','T','W','T','F','S','S'];
   el.innerHTML = habits.map(h => {
     const completions=h.completions||[], streak=calcStreak(completions);
-    document.getElementById('dashStreak').textContent=`${streak}🔥`;
     return `<div class="habit-item"><div style="font-size:1.5rem;">${h.emoji||'📚'}</div><div class="habit-info"><div class="habit-name">${escapeHtml(h.name)}</div><div class="habit-streak" ${streak>0?`aria-label="${streak} day streak"`:'aria-label="No streak yet"'}>${streak>0?`🔥 ${streak}-day streak`:'Start your streak!'}</div></div><div class="habit-week">${days.map((d,i)=>{ const date=getWeekDate(i),done=completions.includes(date); return `<div class="hday ${done?'done':''}" role="checkbox" aria-checked="${done}" tabindex="0" aria-label="${d} ${date}${done?' (complete)':''}" onclick="toggleHabitDay('${h.id}','${date}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleHabitDay('${h.id}','${date}')}" title="${date}">${done?'':d}</div>`; }).join('')}</div></div>`;
   }).join('');
 }
@@ -895,8 +900,11 @@ function calcStreak(completions) {
 async function toggleHabitDay(habitId, date) {
   const habit=habits.find(h=>h.id===habitId); if (!habit) return;
   habit.completions=habit.completions||[]; const idx=habit.completions.indexOf(date);
+  const prev=habit.completions.slice();
   if (idx===-1) habit.completions.push(date); else habit.completions.splice(idx,1);
-  renderHabits(); await sb.from('habits').update({completions:habit.completions,updated_at:toLocalISOString()}).eq('id',habitId);
+  renderHabits(); updateDashStats();
+  const { error } = await sb.from('habits').update({completions:habit.completions,updated_at:toLocalISOString()}).eq('id',habitId);
+  if (error) { habit.completions=prev; renderHabits(); updateDashStats(); }
 }
 
 function openHabitModal() { openModal('habitModal'); document.getElementById('habitName').focus(); }
@@ -904,8 +912,17 @@ function openHabitModal() { openModal('habitModal'); document.getElementById('ha
 async function saveHabit() {
   const name=document.getElementById('habitName').value.trim(); if (!name) return;
   const emoji=document.getElementById('habitEmoji').value||'📚';
+  const btn=document.querySelector('#habitModal .modal-actions button:last-child');
+  if (btn) btn.disabled=true;
   const {data,error}=await sb.from('habits').insert({user_id:currentUser.id,name,emoji,completions:[],created_at:toLocalISOString()}).select().single();
-  if (!error&&data) { habits.push(data); renderHabits(); document.getElementById('habitName').value=''; document.getElementById('habitEmoji').value=''; closeModal('habitModal'); }
+  if (btn) btn.disabled=false;
+  if (!error&&data) { habits.push(data); renderHabits(); updateDashStats(); document.getElementById('habitName').value=''; document.getElementById('habitEmoji').value=''; closeModal('habitModal'); }
+  else {
+    const t=document.getElementById('taskErrorToast');
+    t.textContent='Could not save habit. Please try again.';
+    t.style.display='block';
+    setTimeout(()=>{t.style.display='none';},3000);
+  }
 }
 
 // ── MODALS ──────────────────────────────────────────────────

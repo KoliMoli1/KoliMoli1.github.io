@@ -500,7 +500,7 @@ function toLocalISOString(d = new Date()) {
 
 // ── FINISH ─────────────────────────────────────────────────
 async function finishOnboarding() {
-  if (!currentUser) return;
+  await waitForUser();
   const btn = document.getElementById('btnFinish');
   const spinner = document.getElementById('finishSpinner');
   btn.disabled = true;

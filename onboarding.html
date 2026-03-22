@@ -388,7 +388,7 @@ let currentUser = null;
   if (!session) { window.location.href = 'auth.html'; return; }
   currentUser = session.user;
   // If already onboarded, skip to dashboard
-  const { data: profile } = await sb.from('profiles').select('onboarding_done').eq('id', currentUser.id).single();
+  const { data: profile } = await sb.from('profiles').select('onboarding_done').eq('id', currentUser.id).maybeSingle();
   if (profile?.onboarding_done) { window.location.href = 'dashboard.html'; return; }
 })();
 
@@ -500,7 +500,7 @@ function toLocalISOString(d = new Date()) {
 
 // ── FINISH ─────────────────────────────────────────────────
 async function finishOnboarding() {
-  if (!currentUser) return;
+  await waitForUser();
   const btn = document.getElementById('btnFinish');
   const spinner = document.getElementById('finishSpinner');
   btn.disabled = true;

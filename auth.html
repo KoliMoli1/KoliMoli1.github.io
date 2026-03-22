@@ -404,7 +404,7 @@ function switchTab(tab) {
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
-    const { data: profile } = await sb.from('profiles').select('onboarding_done').eq('id', session.user.id).single();
+    const { data: profile } = await sb.from('profiles').select('onboarding_done').eq('id', session.user.id).maybeSingle();
     window.location.href = profile?.onboarding_done ? 'dashboard.html' : 'onboarding.html';
   }
 })();
@@ -472,7 +472,7 @@ document.getElementById('formLogin').addEventListener('submit', async (e) => {
   if (error) { showError('loginError', error.message); return; }
 
   // Check onboarding status
-  const { data: profile } = await sb.from('profiles').select('onboarding_done').eq('id', data.user.id).single();
+  const { data: profile } = await sb.from('profiles').select('onboarding_done').eq('id', data.user.id).maybeSingle();
   window.location.href = profile?.onboarding_done ? 'dashboard.html' : 'onboarding.html';
 });
 
